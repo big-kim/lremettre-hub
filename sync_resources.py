@@ -79,6 +79,21 @@ def scan_docs():
         ]
     }
 
+    # REBOOM 프로젝트 프리셋
+    existing_meta['presentation-REBOOM프로젝트PPT'] = {
+        "title": "REBOOM 프로젝트 공식 프레젠테이션",
+        "subtitle": "르메뜨레 REBOOM 혁신 프로젝트 기획 및 실행 전략",
+        "badge": "NEW DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레의 신규 성장 동력 및 비즈니스 비전을 담은 REBOOM 프로젝트 공식 발표 자료입니다. 브라우저에서 바로 열어 F11 풀스크린으로 발표할 수 있습니다.",
+        "key_points": [
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11 풀스크린)",
+            "방향키(←, →) 및 터치 제스처 슬라이드 넘김 완비",
+            "화이트/다크 배경 테마 실시간 토글 지원",
+            "고화질 공식 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
     resources = []
     groups = {}
 
@@ -196,6 +211,11 @@ def scan_docs():
 
         if "web_deck_url" in preset:
             item["web_deck_url"] = preset["web_deck_url"]
+        elif "pdf" in ginfo["files"]:
+            encoded_pdf = urllib.parse.quote(ginfo["files"]["pdf"]["url"])
+            encoded_title = urllib.parse.quote(title)
+            item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}"
+
         if "author" in preset:
             item["author"] = preset["author"]
         if "slide_count" in preset:

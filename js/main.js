@@ -109,8 +109,10 @@
           downloadBtnsHtml = `<div class="card-download-group" style="flex-wrap: wrap;">${btns.join('')}</div>`;
         }
 
-        const launchBtn = item.web_deck_url
-          ? `<a href="${item.web_deck_url}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
+        const webDeckUrl = item.web_deck_url || (item.downloads && item.downloads.pdf ? `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}` : null);
+
+        const launchBtn = webDeckUrl
+          ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
               <span>🚀</span> 라이브 웹 프레젠테이션 시작 (16:9 와이드)
             </a>`
           : '';
