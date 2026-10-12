@@ -175,6 +175,21 @@ def scan_docs():
         ]
     }
 
+    # 르메뜨레 신규 메인 피치덱 (27p) 프리셋
+    existing_meta['presentation-LReMeTTReNEWPPT'] = {
+        "title": "르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학",
+        "subtitle": "REMETTRE (Restore) · 가장 활력 넘치던 본연의 상태로 당신의 삶을 되돌립니다",
+        "badge": "OFFICIAL DECK",
+        "author": "L.REMETTRE R&D / BRAND GROUP",
+        "slide_count": 27,
+        "description": "르메뜨레의 세포 과학 메커니즘과 프리미엄 웰니스 브랜드 비전을 담은 27페이지 공식 메인 피치덱입니다. 웹 브라우저에서 바로 시네마틱 프레젠테이션으로 발표할 수 있습니다.",
+        "key_points": [
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11 풀스크린)",
+            "27페이지 공식 메인 브랜드 및 세포 과학 메커니즘 수록",
+            "고화질 공식 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
     resources = []
     groups = {}
 
