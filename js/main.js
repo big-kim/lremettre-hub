@@ -22,13 +22,74 @@
   const stageCurrentIdx = document.getElementById('stage-current-idx');
   const stageTotalIdx = document.getElementById('stage-total-idx');
   const stageProgressFill = document.getElementById('stage-progress-fill');
+  const tabDeckCellScience = document.getElementById('tab-deck-cell-science');
   const tabDeckLeadership = document.getElementById('tab-deck-leadership');
   const tabDeckReboom = document.getElementById('tab-deck-reboom');
   const btnTopLaunch = document.getElementById('btn-top-launch');
   const heroMainCta = document.getElementById('hero-main-cta');
 
-  let currentDeck = 'leadership'; // 'leadership' | 'reboom'
+  let currentDeck = 'cell-science'; // 'cell-science' | 'leadership' | 'reboom'
   let currentSlideIdx = 0;
+  let currentCellSlideIdx = 0;
+
+  // 1. 메인 라이브 피치덱: 르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학 (27p)
+  const CELL_SCIENCE_PDF_URL = 'docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/L.ReMeTTRe_NEW_PPT.pdf';
+  const CELL_SCIENCE_VIEWER_URL = `viewer.html?file=${encodeURIComponent(CELL_SCIENCE_PDF_URL)}&title=${encodeURIComponent('르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학')}`;
+
+  const CELL_SCIENCE_SLIDES = [
+    {
+      type: 'cover',
+      tag: 'L.REMETTRE OFFICIAL MAIN DECK (27P)',
+      title: '르메뜨레(L.ReMeTTRe) :\n세포의 시간을 되돌리는 과학',
+      subtitle: 'REMETTRE (Restore) · 가장 활력 넘치던 본연의 상태로 당신의 삶을 되돌립니다',
+      quote: '시간을 멈출 수는 없지만, 세포의 활력은 되돌릴 수 있습니다. 세포 수준의 재생과 생체 에너지 회복을 실현합니다.'
+    },
+    {
+      type: 'content',
+      tag: 'CELLULAR SCIENCE ARCHITECTURE',
+      index: 2,
+      title: '세포 재생의 3대 핵심 메커니즘',
+      subtitle: '피부 표면이 아닌 세포의 근원적 활력과 생체 에너지를 깨우는 과학적 접근',
+      card_left: {
+        badge: 'MECHANISM 01',
+        badge_color: 'danger',
+        quote: '미토콘드리아 ATP 활력 에너지 복원',
+        body: '세포 호흡과 대사 기능을 극대화하여 지친 세포의 자생적 재생 사이클을 빠르게 정상화합니다.',
+        result: '생체 에너지 활성화'
+      },
+      card_right: {
+        badge: 'MECHANISM 02',
+        badge_color: 'success',
+        quote: '강력한 항산화 네트워크 & 자가치유',
+        body: '활성산소와 외부 산화 스트레스를 억제하고 세포막 지질층을 탄탄하게 복구합니다.',
+        result: '세포 방어벽 강화'
+      },
+      quote: '독보적 유효 성분 전달 기술로 유효 물질이 세포 깊숙이 안정적으로 침투합니다.'
+    },
+    {
+      type: 'content',
+      tag: 'PREMIUM WELLNESS VISION',
+      index: 3,
+      title: '글로벌 웰니스 라이프 패러다임',
+      subtitle: '과학적 임상 데이터와 프리미엄 성분으로 완성되는 르메뜨레의 가치 성장',
+      card_left: {
+        badge: 'POINT 01',
+        badge_color: 'danger',
+        quote: '독점 원료 배합 특허 & 임상 검증',
+        body: '식물성 뮤신 오크라 및 프리미엄 복합 포뮬러를 통한 안전하고 확실한 세포 재생 효과를 입증합니다.',
+        result: '공식 임상 완료'
+      },
+      card_right: {
+        badge: 'POINT 02',
+        badge_color: 'success',
+        quote: '글로벌 비즈니스 & 비전 로드맵',
+        body: '파트너와 함께 지속 가능한 가치를 창출하고 시대를 앞서가는 웰니스 문화를 선도합니다.',
+        result: '동반 성장 시스템'
+      },
+      quote: '총 27장의 공식 고화질 슬라이드를 F11 전체화면으로 지금 바로 발표하세요.'
+    }
+  ];
+
   const leadershipSlides = window.LEADERSHIP_SLIDES || [];
 
   const REBOOM_PDF_URL = 'docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/250720_%EB%A5%B4%EB%A9%94%EB%94%A8%EB%A5%B4_REBOOM_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98.pdf';
@@ -39,6 +100,100 @@
    * 1. 히어로 라이브 스테이지 (THE CINEMATIC LIVE STAGE)
    * ==========================================================================
    */
+
+  function renderCellScienceSlide(index) {
+    if (!stageCanvas || !CELL_SCIENCE_SLIDES.length) return;
+
+    const slide = CELL_SCIENCE_SLIDES[index];
+    if (!slide) return;
+
+    if (slide.type === 'cover') {
+      stageCanvas.innerHTML = `
+        <div class="stage-slide-view active slide-cover-layout">
+          <img src="assets/logo/lremettre_emblem.png" alt="L.REMETTRE" class="cover-brand-symbol">
+          <div class="cover-super-pill">
+            <span>✨</span> ${slide.tag || 'L.REMETTRE OFFICIAL MAIN DECK'}
+          </div>
+          <h3 class="cover-title">
+            ${(slide.title || '').replace(/\n/g, '<br>')}
+          </h3>
+          <p class="cover-subtitle">
+            ${slide.subtitle || ''}
+          </p>
+          ${slide.quote ? `
+            <div class="cover-quote-box">
+              <span>“</span> ${slide.quote} <span>”</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else {
+      const cardLeft = slide.card_left || {};
+      const cardRight = slide.card_right || {};
+
+      stageCanvas.innerHTML = `
+        <div class="stage-slide-view active">
+          <div>
+            <div class="slide-top-meta">
+              <span class="slide-tag-pill">${slide.tag || 'CELLULAR SCIENCE'}</span>
+              <span style="font-size: 11.5px; font-weight: 700; color: var(--gold-bright); letter-spacing: 1px;">
+                KEY INSIGHT ${slide.index} OF ${CELL_SCIENCE_SLIDES.length}
+              </span>
+            </div>
+            <h3 class="slide-headline">${(slide.title || '').replace(/\n/g, ' ')}</h3>
+            <p class="slide-lead-copy">${slide.subtitle || ''}</p>
+          </div>
+
+          <div class="slide-cards-split">
+            <div class="slide-mini-card ${cardLeft.badge_color || 'danger'}">
+              <div>
+                <div class="card-badge-mini text-${cardLeft.badge_color || 'danger'}">
+                  ${cardLeft.badge || 'POINT A'}
+                </div>
+                <div class="card-quote-mini">${cardLeft.quote || ''}</div>
+                <div class="card-body-mini">${cardLeft.body || ''}</div>
+              </div>
+              ${cardLeft.result ? `
+                <div class="card-result-pill-mini">
+                  ${cardLeft.result}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="slide-mini-card ${cardRight.badge_color || 'success'}">
+              <div>
+                <div class="card-badge-mini text-${cardRight.badge_color || 'success'}">
+                  ${cardRight.badge || 'POINT B'}
+                </div>
+                <div class="card-quote-mini">${cardRight.quote || ''}</div>
+                <div class="card-body-mini">${cardRight.body || ''}</div>
+              </div>
+              ${cardRight.result ? `
+                <div class="card-result-pill-mini">
+                  ${cardRight.result}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          ${slide.quote ? `
+            <div class="slide-ethos-footer">
+              <strong>OFFICIAL DECK HIGHLIGHT</strong>
+              <span>“${slide.quote}”</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // UI 인디케이터 업데이트 (27장 피치덱 기준)
+    if (stageCurrentIdx) stageCurrentIdx.textContent = String(index + 1).padStart(2, '0');
+    if (stageTotalIdx) stageTotalIdx.textContent = '27';
+    if (stageProgressFill) {
+      const pct = ((index + 1) / 27) * 100;
+      stageProgressFill.style.width = `${pct}%`;
+    }
+  }
 
   function renderLeadershipSlide(index) {
     if (!stageCanvas || !leadershipSlides.length) return;
@@ -180,9 +335,25 @@
 
   function updateDeckState(deck) {
     currentDeck = deck;
-    if (deck === 'leadership') {
-      if (tabDeckLeadership) tabDeckLeadership.classList.add('active');
-      if (tabDeckReboom) tabDeckReboom.classList.remove('active');
+
+    // 탭 스타일 활성화 토글
+    if (tabDeckCellScience) tabDeckCellScience.classList.toggle('active', deck === 'cell-science');
+    if (tabDeckLeadership) tabDeckLeadership.classList.toggle('active', deck === 'leadership');
+    if (tabDeckReboom) tabDeckReboom.classList.toggle('active', deck === 'reboom');
+
+    if (deck === 'cell-science') {
+      if (btnTopLaunch) {
+        btnTopLaunch.href = CELL_SCIENCE_VIEWER_URL;
+        btnTopLaunch.innerHTML = '<span>⛶</span> 전체화면 ↗';
+      }
+      if (heroMainCta) {
+        heroMainCta.href = CELL_SCIENCE_VIEWER_URL;
+        heroMainCta.innerHTML = '<span>🚀</span> 프레젠테이션 시작';
+      }
+      if (stagePrevBtn) stagePrevBtn.style.visibility = 'visible';
+      if (stageNextBtn) stageNextBtn.style.visibility = 'visible';
+      renderCellScienceSlide(currentCellSlideIdx);
+    } else if (deck === 'leadership') {
       if (btnTopLaunch) {
         btnTopLaunch.href = 'presentation.html';
         btnTopLaunch.innerHTML = '<span>⛶</span> 전체화면 발표 ↗';
@@ -195,8 +366,6 @@
       if (stageNextBtn) stageNextBtn.style.visibility = 'visible';
       renderLeadershipSlide(currentSlideIdx);
     } else {
-      if (tabDeckLeadership) tabDeckLeadership.classList.remove('active');
-      if (tabDeckReboom) tabDeckReboom.classList.add('active');
       if (btnTopLaunch) {
         btnTopLaunch.href = REBOOM_VIEWER_URL;
         btnTopLaunch.innerHTML = '<span>⛶</span> REBOOM 발표 ↗';
@@ -215,6 +384,9 @@
     if (!stageCanvas) return;
 
     // 탭 이벤트
+    if (tabDeckCellScience) {
+      tabDeckCellScience.addEventListener('click', () => updateDeckState('cell-science'));
+    }
     if (tabDeckLeadership) {
       tabDeckLeadership.addEventListener('click', () => updateDeckState('leadership'));
     }
@@ -225,17 +397,25 @@
     // 슬라이드 이전/다음
     if (stagePrevBtn) {
       stagePrevBtn.addEventListener('click', () => {
-        if (currentDeck !== 'leadership' || !leadershipSlides.length) return;
-        currentSlideIdx = (currentSlideIdx - 1 + leadershipSlides.length) % leadershipSlides.length;
-        renderLeadershipSlide(currentSlideIdx);
+        if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
+          currentCellSlideIdx = (currentCellSlideIdx - 1 + CELL_SCIENCE_SLIDES.length) % CELL_SCIENCE_SLIDES.length;
+          renderCellScienceSlide(currentCellSlideIdx);
+        } else if (currentDeck === 'leadership' && leadershipSlides.length) {
+          currentSlideIdx = (currentSlideIdx - 1 + leadershipSlides.length) % leadershipSlides.length;
+          renderLeadershipSlide(currentSlideIdx);
+        }
       });
     }
 
     if (stageNextBtn) {
       stageNextBtn.addEventListener('click', () => {
-        if (currentDeck !== 'leadership' || !leadershipSlides.length) return;
-        currentSlideIdx = (currentSlideIdx + 1) % leadershipSlides.length;
-        renderLeadershipSlide(currentSlideIdx);
+        if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
+          currentCellSlideIdx = (currentCellSlideIdx + 1) % CELL_SCIENCE_SLIDES.length;
+          renderCellScienceSlide(currentCellSlideIdx);
+        } else if (currentDeck === 'leadership' && leadershipSlides.length) {
+          currentSlideIdx = (currentSlideIdx + 1) % leadershipSlides.length;
+          renderLeadershipSlide(currentSlideIdx);
+        }
       });
     }
 
@@ -244,7 +424,15 @@
       // 텍스트 인풋 포커스 중에는 제외
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-      if (currentDeck === 'leadership' && leadershipSlides.length) {
+      if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+          currentCellSlideIdx = (currentCellSlideIdx + 1) % CELL_SCIENCE_SLIDES.length;
+          renderCellScienceSlide(currentCellSlideIdx);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          currentCellSlideIdx = (currentCellSlideIdx - 1 + CELL_SCIENCE_SLIDES.length) % CELL_SCIENCE_SLIDES.length;
+          renderCellScienceSlide(currentCellSlideIdx);
+        }
+      } else if (currentDeck === 'leadership' && leadershipSlides.length) {
         if (e.key === 'ArrowRight' || e.key === 'PageDown') {
           currentSlideIdx = (currentSlideIdx + 1) % leadershipSlides.length;
           renderLeadershipSlide(currentSlideIdx);
@@ -255,8 +443,8 @@
       }
     });
 
-    // 초기 렌더링
-    updateDeckState('leadership');
+    // 초기 렌더링 (세포 과학 피치덱 메인 라이브 기본 활성화)
+    updateDeckState('cell-science');
   }
 
   /**
