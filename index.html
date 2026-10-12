@@ -9,7 +9,7 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=6">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo/lremettre_emblem.png">
@@ -172,9 +172,66 @@
     </div>
   </footer>
 
+  <!-- Security Access Download Modal -->
+  <div id="auth-modal-backdrop" class="auth-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div id="auth-modal-dialog" class="auth-modal-dialog">
+      <button id="auth-close-btn" class="auth-modal-close-btn" title="닫기 (ESC)">✕</button>
+
+      <div class="auth-modal-header">
+        <div class="auth-badge">
+          <span>🔒</span> L.REMETTRE SECURITY ACCESS
+        </div>
+        <h2 id="auth-modal-title" class="auth-modal-title">공식 자료 보안 인증</h2>
+        <p class="auth-modal-desc">
+          본 자료는 르메뜨레 공식 파트너 전용 보안 문서입니다.<br>
+          배포 승인된 <strong>4자리 보안 비밀번호</strong>를 입력하세요.
+        </p>
+      </div>
+
+      <!-- Target File Preview -->
+      <div id="auth-target-file-info" class="auth-target-file-info"></div>
+
+      <!-- Password Input Form -->
+      <form id="auth-modal-form" class="auth-modal-form" onsubmit="return false;">
+        <div class="auth-input-wrapper">
+          <span class="auth-input-icon">🔑</span>
+          <input 
+            type="password" 
+            id="auth-pw-input" 
+            class="auth-pw-input" 
+            placeholder="비밀번호 입력 (4자리)" 
+            maxlength="16" 
+            autocomplete="current-password"
+          >
+          <button type="button" id="auth-toggle-pw-btn" class="auth-toggle-pw-btn" title="비밀번호 표시/숨김">👁️</button>
+        </div>
+
+        <div id="auth-error-msg" class="auth-error-msg" style="display: none;"></div>
+
+        <div class="auth-modal-actions">
+          <button type="submit" id="auth-submit-btn" class="btn-auth-submit">
+            <span>🔓</span> 보안 해제 및 다운로드
+          </button>
+          <button type="button" id="auth-cancel-btn" class="btn-auth-cancel">
+            취소
+          </button>
+        </div>
+      </form>
+
+      <!-- Security Notice -->
+      <div class="auth-modal-footer">
+        <p>
+          <span>ℹ️</span> 비밀번호 변경 및 신규 발급은 <strong>에이전트(관리자)</strong>를 통해서만 가능합니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
-  <script src="js/slides-data.js?v=4"></script>
-  <script src="js/interactive-bg.js?v=4"></script>
-  <script src="js/main.js?v=4"></script>
+  <script src="js/slides-data.js?v=5"></script>
+  <script src="js/interactive-bg.js?v=5"></script>
+  <script src="js/auth-config.js?v=5"></script>
+  <script src="js/auth-download.js?v=5"></script>
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>
