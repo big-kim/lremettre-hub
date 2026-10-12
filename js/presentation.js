@@ -212,7 +212,7 @@
    * 5. 테마 토글 (화이트 에디션 ☀️ vs 다크 에디션 🌙)
    */
   function initTheme() {
-    const savedTheme = localStorage.getItem('lremettre-deck-theme') || 'white';
+    const savedTheme = localStorage.getItem('lremettre-deck-theme') || 'dark';
     applyTheme(savedTheme);
   }
 

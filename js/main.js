@@ -1,5 +1,6 @@
 /**
  * 르메뜨레 디지털 아카이브 허브 (L.REMETTRE Hub Main Controller)
+ * 딥블랙 + 딥오렌지 + 골드 럭셔리 디자인 시스템
  */
 
 (function () {
@@ -12,10 +13,6 @@
   const gridContainer = document.getElementById('resources-grid');
   const searchInput = document.getElementById('search-input');
   const filterButtons = document.querySelectorAll('.filter-btn');
-  const guideModal = document.getElementById('guide-modal');
-  const openGuideBtn = document.getElementById('btn-open-guide');
-  const closeGuideBtn = document.getElementById('btn-close-guide');
-  const modalCloseCross = document.getElementById('modal-close-cross');
 
   /**
    * 1. 데이터 로드 (캐시 방지 파라미터 적용)
@@ -83,10 +80,10 @@
 
     if (filtered.length === 0) {
       gridContainer.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #FFFFFF; border-radius: 16px; border: 1.5px dashed #E8E2D2;">
-          <p style="font-size: 28px; margin-bottom: 8px;">🔍</p>
-          <h3 style="font-size: 18px; color: #0F172A; margin-bottom: 6px;">일치하는 자료가 없습니다</h3>
-          <p style="font-size: 14px; color: #64748B;">다른 검색어를 입력하시거나 카테고리 필터를 변경해 보세요.</p>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 70px 20px; background: rgba(19, 23, 34, 0.7); border-radius: 20px; border: 1.5px dashed rgba(255, 255, 255, 0.1);">
+          <p style="font-size: 32px; margin-bottom: 10px;">🔍</p>
+          <h3 style="font-size: 19px; color: #FFFFFF; margin-bottom: 6px;">일치하는 공식 자료가 없습니다</h3>
+          <p style="font-size: 14px; color: #94A3B8;">다른 검색어를 입력하시거나 카테고리 필터를 변경해 보세요.</p>
         </div>
       `;
       return;
@@ -106,9 +103,10 @@
           const btns = Object.entries(item.downloads).map(([type, fileInfo]) => {
             return getDownloadBtnHtml(type, fileInfo);
           });
-          downloadBtnsHtml = `<div class="card-download-group" style="flex-wrap: wrap;">${btns.join('')}</div>`;
+          downloadBtnsHtml = `<div class="card-download-group">${btns.join('')}</div>`;
         }
 
+        // 웹 프레젠테이션 URL 자동 fallback (전용 덱이 없어도 PDF가 있으면 viewer.html 연결)
         const webDeckUrl = item.web_deck_url || (item.downloads && item.downloads.pdf ? `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}` : null);
 
         const launchBtn = webDeckUrl
@@ -159,26 +157,6 @@
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
       renderResources();
-    });
-  }
-
-  /**
-   * 6. 가이드 모달 제어
-   */
-  function openModal() {
-    guideModal.classList.add('open');
-  }
-
-  function closeModal() {
-    guideModal.classList.remove('open');
-  }
-
-  if (openGuideBtn) openGuideBtn.addEventListener('click', openModal);
-  if (closeGuideBtn) closeGuideBtn.addEventListener('click', closeModal);
-  if (modalCloseCross) modalCloseCross.addEventListener('click', closeModal);
-  if (guideModal) {
-    guideModal.addEventListener('click', (e) => {
-      if (e.target === guideModal) closeModal();
     });
   }
 

@@ -14,52 +14,56 @@
    THEME DEFINITIONS
    ========================================================================== */
 
-/* 1. White Edition (Default / Warm Cream Signature) */
+/* 1. Pure White Edition (Hi-Tech Clean) */
 body.theme-white {
-  --bg-page: #F1ECE1;
-  --bg-slide: #FFFDF8;
-  --bg-pattern: radial-gradient(rgba(15, 23, 42, 0.06) 1.5px, transparent 1.5px);
+  --bg-page: #EDF2F7;
+  --bg-slide: #FFFFFF;
+  --bg-pattern: radial-gradient(rgba(15, 23, 42, 0.05) 1.5px, transparent 1.5px);
   
-  --card-bg: #FFFFFF;
-  --card-border: #E8E2D2;
-  --card-shadow: 0 16px 36px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.03);
+  --card-bg: #F8FAFC;
+  --card-border: #E2E8F0;
+  --card-shadow: 0 16px 36px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
   
   --title-color: #0F172A;
   --subtitle-color: #334155;
   --body-color: #1E293B;
   --muted-color: #64748B;
   
-  --gold: #B8860B;
-  --gold-bg: rgba(184, 134, 11, 0.12);
-  --gold-border: rgba(184, 134, 11, 0.35);
+  --gold: #D97706;
+  --gold-bg: rgba(217, 119, 6, 0.12);
+  --gold-border: rgba(217, 119, 6, 0.35);
+
+  --orange: #FF5722;
+  --orange-bg: rgba(255, 87, 34, 0.12);
+  --orange-border: rgba(255, 87, 34, 0.35);
   
   --green: #059669;
   --green-bg: rgba(5, 150, 105, 0.1);
   --green-border: rgba(5, 150, 105, 0.3);
   
-  --red: #DC2626;
-  --red-bg: rgba(220, 38, 38, 0.08);
-  --red-border: rgba(220, 38, 38, 0.25);
+  --red: #FF5722;
+  --red-bg: rgba(255, 87, 34, 0.08);
+  --red-border: rgba(255, 87, 34, 0.3);
   
-  --hud-bg: rgba(255, 253, 248, 0.94);
-  --hud-border: #E8E2D2;
+  --hud-bg: rgba(255, 255, 255, 0.94);
+  --hud-border: #E2E8F0;
   --hud-text: #0F172A;
   --hud-btn-bg: #FFFFFF;
-  --hud-btn-border: #E2E8F0;
+  --hud-btn-border: #CBD5E1;
   
-  --quote-box-bg: #FAF6EE;
-  --quote-box-border: #E8E2D2;
+  --quote-box-bg: #F1F5F9;
+  --quote-box-border: #E2E8F0;
 }
 
-/* 2. Obsidian Dark Edition */
+/* 2. Deep Obsidian Black & Deep Orange Edition (Brand Default) */
 body.theme-dark {
-  --bg-page: #060911;
-  --bg-slide: #0B0F19;
-  --bg-pattern: radial-gradient(rgba(255, 255, 255, 0.04) 1.5px, transparent 1.5px);
+  --bg-page: #050608;
+  --bg-slide: #090B10;
+  --bg-pattern: radial-gradient(rgba(255, 87, 34, 0.06) 1.5px, transparent 1.5px);
   
-  --card-bg: #141B2D;
-  --card-border: #232F48;
-  --card-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 6px 16px rgba(0, 0, 0, 0.35);
+  --card-bg: #121622;
+  --card-border: #1E2638;
+  --card-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 6px 16px rgba(0, 0, 0, 0.45);
   
   --title-color: #F8FAFC;
   --subtitle-color: #CBD5E1;
@@ -69,23 +73,27 @@ body.theme-dark {
   --gold: #F59E0B;
   --gold-bg: rgba(245, 158, 11, 0.15);
   --gold-border: rgba(245, 158, 11, 0.4);
+
+  --orange: #FF5722;
+  --orange-bg: rgba(255, 87, 34, 0.18);
+  --orange-border: rgba(255, 87, 34, 0.45);
   
   --green: #10B981;
   --green-bg: rgba(16, 185, 129, 0.15);
   --green-border: rgba(16, 185, 129, 0.35);
   
-  --red: #EF4444;
-  --red-bg: rgba(239, 68, 68, 0.15);
-  --red-border: rgba(239, 68, 68, 0.35);
+  --red: #FF5722;
+  --red-bg: rgba(255, 87, 34, 0.16);
+  --red-border: rgba(255, 87, 34, 0.4);
   
-  --hud-bg: rgba(11, 15, 25, 0.94);
-  --hud-border: #232F48;
+  --hud-bg: rgba(9, 11, 16, 0.94);
+  --hud-border: #1E2638;
   --hud-text: #F8FAFC;
-  --hud-btn-bg: #182238;
-  --hud-btn-border: #2D3A58;
+  --hud-btn-bg: #141A29;
+  --hud-btn-border: #28334D;
   
-  --quote-box-bg: #101626;
-  --quote-box-border: #232F48;
+  --quote-box-bg: #0D111A;
+  --quote-box-border: #1E2638;
 }
 
 /* Base Setup */
