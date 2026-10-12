@@ -282,24 +282,24 @@
 
     if (type === 'pptx' || type === 'ppt') {
       icon = '📊';
-      label = '파워포인트 (PPTX)';
+      label = 'PPTX';
     } else if (type === 'pdf') {
       icon = '📄';
-      label = 'PDF 문서';
+      label = 'PDF';
     } else if (type === 'excel' || type === 'xlsx' || type === 'xls') {
       icon = '📑';
-      label = '엑셀 (Excel)';
+      label = 'Excel';
     } else if (type === 'word' || type === 'docx') {
       icon = '📝';
-      label = '워드 (Word)';
+      label = 'Word';
     } else if (type === 'image' || type === 'png' || type === 'jpg') {
       icon = '🖼️';
-      label = '고화질 이미지';
+      label = 'Image';
     }
 
     return `
       <a href="${fileInfo.url}" class="btn-download-pill" download="${fileInfo.name}" target="_blank" title="${fileInfo.name} 다운로드">
-        <span>${icon}</span> ${label} (${fileInfo.size})
+        <span>${icon}</span> <span>${label}</span> <span class="file-size">${fileInfo.size}</span>
       </a>
     `;
   }
@@ -333,12 +333,6 @@
 
     gridContainer.innerHTML = filtered
       .map((item) => {
-        const keypointsHtml = item.key_points
-          ? `<ul class="card-keypoints">
-              ${item.key_points.map((kp) => `<li>${kp}</li>`).join('')}
-            </ul>`
-          : '';
-
         let downloadBtnsHtml = '';
         if (item.downloads) {
           const btns = Object.entries(item.downloads).map(([type, fileInfo]) => {
@@ -367,20 +361,48 @@
                 </a>`
               : '');
 
+        // 16:9 썸네일 그래픽 설정
+        const badgeText = item.badge || item.category_name;
+        const pageCountBadge = item.slide_count ? `${item.slide_count}P` : (item.version || 'v1.0');
+
         return `
           <article class="resource-card" id="card-${item.id}">
-            <div>
-              <div class="card-top">
-                <span class="card-category-badge">${item.category_name}</span>
-                <span class="card-version-tag">${item.version} · ${item.date}</span>
+            <!-- 16:9 Thumbnail Stage Header -->
+            <div class="card-thumb-container">
+              <div class="card-thumb-aspect">
+                <div class="card-thumb-bg">
+                  <img src="assets/logo/lremettre_emblem.png" alt="L.ReMeTTRE" class="thumb-watermark">
+                  <div class="thumb-center-badge">
+                    <span class="thumb-glow-icon">${item.category === 'presentation' ? '📽️' : '📑'}</span>
+                    <span class="thumb-deck-type">16:9 WIDESCREEN</span>
+                  </div>
+                </div>
+
+                <div class="card-thumb-top-meta">
+                  <span class="card-category-badge">${badgeText}</span>
+                  <span class="card-version-tag">${pageCountBadge}</span>
+                </div>
+
+                ${webDeckUrl ? `
+                  <a href="${webDeckUrl}" class="card-thumb-hover-link" target="_blank" title="클릭 시 프레젠테이션 바로보기">
+                    <div class="hover-play-circle">
+                      <span>▶</span>
+                    </div>
+                    <span class="hover-play-label">프레젠테이션 시작</span>
+                  </a>
+                ` : ''}
               </div>
-              <h3 class="card-title">${item.title}</h3>
-              ${item.subtitle ? `<div class="card-subtitle">${item.subtitle}</div>` : ''}
-              <p class="card-description">${item.description}</p>
-              ${keypointsHtml}
             </div>
 
-            <div class="card-footer">
+            <!-- Card Content Body -->
+            <div class="card-body-compact">
+              <h3 class="card-title" title="${item.title}">${item.title}</h3>
+              ${item.subtitle ? `<div class="card-subtitle" title="${item.subtitle}">${item.subtitle}</div>` : ''}
+              <p class="card-description">${item.description}</p>
+            </div>
+
+            <!-- Card Footer: Actions -->
+            <div class="card-footer-compact">
               ${launchBtn}
               ${downloadBtnsHtml}
             </div>

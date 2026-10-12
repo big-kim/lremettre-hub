@@ -9,7 +9,7 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo/lremettre_emblem.png">
@@ -41,80 +41,83 @@
     </div>
   </header>
 
-  <!-- Hero Section: Cinematic Live Stage (Concept 1: Apple Keynote & Vercel Style) -->
+  <!-- Hero Section: Compact Split Stage (Left: Editorial & Actions / Right: 16:9 Live Preview) -->
   <section class="hero-stage-section">
-    <div class="container">
-      <div class="hero-head-wrapper">
+    <div class="container hero-split-grid">
+      <!-- Left Column: Hero Text & Actions -->
+      <div class="hero-content-left">
         <div class="hero-super-badge">
-          <span>✨</span> L.REMETTRE EXCLUSIVE PRESENTATION SUITE
+          <span>✨</span> L.REMETTRE EXCLUSIVE SUITE
         </div>
         <h2 class="hero-title-main">
           시대를 선도하는 웰니스,<br>
           <span class="text-gradient">리더의 품격을 담은 라이브 스테이지</span>
         </h2>
         <p class="hero-lead-text">
-          어떤 환경에서도 클릭 한 번으로 16:9 와이드 시네마틱 프레젠테이션을 시작하세요.<br>
+          어떤 환경에서도 클릭 한 번으로 16:9 와이드 시네마틱 프레젠테이션을 시작하세요.
           르메뜨레 비즈니스 그룹의 공식 피치덱과 핵심 성과를 즉시 체험할 수 있는 최첨단 인터랙티브 아카이브입니다.
         </p>
-      </div>
 
-      <!-- The Live Showcase Frame (16:9 Interactive Deck Viewer) -->
-      <div class="stage-showcase-container">
-        <div class="stage-halo-glow"></div>
-        <div class="stage-frame">
-          <!-- Stage Top Bar (Deck Switcher & Direct Fullscreen Link) -->
-          <div class="stage-topbar">
-            <div class="stage-deck-tabs">
-              <button class="stage-tab-btn active" id="tab-deck-leadership" data-deck="leadership">
-                👑 리더십 마스터클래스 (16장)
-              </button>
-              <button class="stage-tab-btn" id="tab-deck-reboom" data-deck="reboom">
-                💡 REBOOM 프로젝트
-              </button>
-            </div>
-            <div class="stage-actions-top">
-              <a href="presentation.html" class="btn-stage-fullscreen" id="btn-top-launch" target="_blank" title="새 탭에서 풀스크린으로 시작">
-                <span>⛶</span> 전체화면 발표 ↗
-              </a>
-            </div>
-          </div>
-
-          <!-- 16:9 Screen Canvas -->
-          <div class="stage-canvas-wrapper" id="stage-canvas">
-            <!-- Dynamically populated by main.js with high-end slides -->
-          </div>
-
-          <!-- Stage Bottom Controller Bar -->
-          <div class="stage-controller-bar">
-            <div class="stage-nav-group">
-              <button class="stage-nav-arrow" id="stage-prev-btn" title="이전 슬라이드 (←)">‹</button>
-              <div class="stage-counter-display">
-                <span id="stage-current-idx">01</span> <span class="total">/ <span id="stage-total-idx">16</span></span>
-              </div>
-              <button class="stage-nav-arrow" id="stage-next-btn" title="다음 슬라이드 (→)">›</button>
-            </div>
-
-            <div class="stage-progress-bar">
-              <div class="stage-progress-fill" id="stage-progress-fill" style="width: 6.25%;"></div>
-            </div>
-
-            <div class="stage-quick-actions">
-              <span style="font-size: 12px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px;">
-                <span>⌨️</span> 방향키 슬라이드 이동
-              </span>
-            </div>
-          </div>
+        <!-- Hero Actions -->
+        <div class="hero-action-group">
+          <a href="presentation.html" class="btn-primary-glow" id="hero-main-cta" target="_blank">
+            <span>🚀</span> 프레젠테이션 시작
+          </a>
+          <a href="#resources-catalog" class="btn-secondary-glass">
+            <span>📂</span> 자료실 탐색
+          </a>
         </div>
       </div>
 
-      <!-- Hero Bottom Action Buttons -->
-      <div class="hero-bottom-actions">
-        <a href="presentation.html" class="btn-primary-glow" id="hero-main-cta" target="_blank">
-          <span>🚀</span> 프레젠테이션 시작
-        </a>
-        <a href="#resources-catalog" class="btn-secondary-glass">
-          <span>📂</span> 공식 자료실 전체 탐색
-        </a>
+      <!-- Right Column: 16:9 Compact Live Stage Showcase -->
+      <div class="hero-stage-right">
+        <div class="stage-showcase-container">
+          <div class="stage-halo-glow"></div>
+          <div class="stage-frame">
+            <!-- Stage Top Bar (Deck Switcher & Direct Fullscreen Link) -->
+            <div class="stage-topbar">
+              <div class="stage-deck-tabs">
+                <button class="stage-tab-btn active" id="tab-deck-leadership" data-deck="leadership">
+                  👑 리더십 마스터클래스
+                </button>
+                <button class="stage-tab-btn" id="tab-deck-reboom" data-deck="reboom">
+                  💡 REBOOM 프로젝트
+                </button>
+              </div>
+              <div class="stage-actions-top">
+                <a href="presentation.html" class="btn-stage-fullscreen" id="btn-top-launch" target="_blank" title="새 탭에서 풀스크린으로 시작">
+                  <span>⛶</span> 전체화면 ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- 16:9 Screen Canvas -->
+            <div class="stage-canvas-wrapper" id="stage-canvas">
+              <!-- Dynamically populated by main.js with high-end slides -->
+            </div>
+
+            <!-- Stage Bottom Controller Bar -->
+            <div class="stage-controller-bar">
+              <div class="stage-nav-group">
+                <button class="stage-nav-arrow" id="stage-prev-btn" title="이전 슬라이드 (←)">‹</button>
+                <div class="stage-counter-display">
+                  <span id="stage-current-idx">01</span> <span class="total">/ <span id="stage-total-idx">16</span></span>
+                </div>
+                <button class="stage-nav-arrow" id="stage-next-btn" title="다음 슬라이드 (→)">›</button>
+              </div>
+
+              <div class="stage-progress-bar">
+                <div class="stage-progress-fill" id="stage-progress-fill" style="width: 6.25%;"></div>
+              </div>
+
+              <div class="stage-quick-actions">
+                <span class="stage-key-hint">
+                  <span>⌨️</span> 방향키 이동
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -168,7 +171,7 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/slides-data.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/slides-data.js?v=3"></script>
+  <script src="js/main.js?v=3"></script>
 </body>
 </html>
