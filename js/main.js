@@ -49,7 +49,7 @@
     if (slide.type === 'cover') {
       stageCanvas.innerHTML = `
         <div class="stage-slide-view active slide-cover-layout">
-          <img src="assets/logo/lremettre_logo.png" alt="L.REMETTRE" class="cover-brand-symbol">
+          <img src="assets/logo/lremettre_emblem.png" alt="L.REMETTRE" class="cover-brand-symbol">
           <div class="cover-super-pill">
             <span>✨</span> ${slide.tag || 'L.REMETTRE LEADERSHIP MASTERCLASS'}
           </div>
