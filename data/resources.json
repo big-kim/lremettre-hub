@@ -1,16 +1,17 @@
 [
   {
-    "id": "leadership-v11",
+    "id": "leadership-masterclass",
     "category": "presentation",
     "category_name": "프레젠테이션 & 강의",
     "title": "변화하는 시대, 리더십의 진짜 온도",
     "subtitle": "앞장서서 빨리 갈 것인가, 함께 끝까지 갈 것인가",
-    "version": "v1.1",
-    "date": "2026-10-12",
-    "status": "official",
+    "version": "v1.0",
+    "date": "2026-07-22",
     "badge": "NEW MASTERCLASS",
-    "badge_type": "accent",
-    "tags": ["리더십", "마스터클래스", "16슬라이드", "유정환교수", "세미나"],
+    "tags": [
+      "프레젠테이션 & 강의",
+      "v1.0"
+    ],
     "description": "르메뜨레 비즈니스 그룹의 코어 에토스(Core Ethos)를 담은 16개 핵심 슬라이드 프레젠테이션입니다. 독선적 속도전에서 벗어나 구성원과 함께 끝까지 완주하는 진짜 리더십의 온도, 스티브 잡스의 실수와 성찰, 크루즈선 시스템, 티업(Tee-Up) 문화, 과학적 원리 기반 신뢰 마케팅을 다룹니다.",
     "key_points": [
       "16:9 와이드스크린 시네마틱 프레젠테이션 완비 (F11 풀스크린 지원)",
@@ -18,20 +19,20 @@
       "각 슬라이드별 핵심 대조 카드(레드/그린/골드) 및 코어 명언 탑재",
       "웹 브라우저 즉시 재생 + 네이티브 PPTX/PDF 원클릭 다운로드"
     ],
-    "author": "유정환 교수 / L.REMETTRE",
-    "slide_count": 16,
-    "web_deck_url": "presentation.html",
     "downloads": {
-      "pptx": {
-        "url": "docs/leadership-temperature-v1.1.pptx",
-        "name": "변화하는시대_리더십의진짜온도_v1.1.pptx",
-        "size": "3.7 MB"
-      },
       "pdf": {
-        "url": "docs/leadership-temperature-v1.0.pdf",
+        "url": "docs/01_프레젠테이션_강의/변화하는시대_리더십의진짜온도_v1.0.pdf",
         "name": "변화하는시대_리더십의진짜온도_v1.0.pdf",
         "size": "1.1 MB"
+      },
+      "pptx": {
+        "url": "docs/01_프레젠테이션_강의/변화하는시대_리더십의진짜온도_v1.1.pptx",
+        "name": "변화하는시대_리더십의진짜온도_v1.1.pptx",
+        "size": "3.6 MB"
       }
-    }
+    },
+    "web_deck_url": "presentation.html",
+    "author": "유정환 교수 / L.REMETTRE",
+    "slide_count": 16
   }
 ]
