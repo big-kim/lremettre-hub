@@ -351,7 +351,7 @@
 
         const launchBtn = webDeckUrl
           ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
-              <span>🚀</span> 라이브 웹 프레젠테이션 시작 (16:9 와이드)
+              <span>🚀</span> 라이브 프레젠테이션 시작 (16:9)
             </a>`
           : '';
 

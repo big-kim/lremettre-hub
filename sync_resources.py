@@ -94,6 +94,34 @@ def scan_docs():
         ]
     }
 
+    # 헬쯔백 B2B 프리셋
+    existing_meta['presentation-주헬쯔백B2B발표PPT'] = {
+        "title": "(주)헬쯔백 B2B 파트너십 프레젠테이션",
+        "subtitle": "헬쯔백 비즈니스 제안 및 B2B 협업 실행 전략",
+        "badge": "B2B DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레와 (주)헬쯔백 간의 B2B 파트너십 구축 및 유통 확장을 위한 공식 비즈니스 피치덱입니다. 웹 브라우저에서 실시간으로 발표할 수 있습니다.",
+        "key_points": [
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "헬쯔백 B2B 비즈니스 모델 및 유통 로드맵 수록",
+            "공식 고화질 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
+    # 오크라 PPT 프리셋
+    existing_meta['presentation-오크라PPT'] = {
+        "title": "르메뜨레 오크라(Okra) 제품 프레젠테이션",
+        "subtitle": "식물성 뮤신 오크라 핵심 원료 및 제품 라인업",
+        "badge": "PRODUCT DECK",
+        "author": "L.REMETTRE R&D / PRODUCT GROUP",
+        "description": "식물성 뮤신이 풍부한 오크라 원료의 핵심 메커니즘과 르메뜨레 프리미엄 제품 라인업을 소개하는 공식 제품 프레젠테이션입니다.",
+        "key_points": [
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "오크라 핵심 원료 효능 및 제품 경쟁력 수록",
+            "공식 고화질 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
     resources = []
     groups = {}
 

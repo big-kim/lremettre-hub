@@ -2,3 +2,6 @@
 Thumbs.db
 *.tmp
 __pycache__/
+
+# GitHub 100MB 단일 파일 제한 초과 파일 (153.7MB)
+docs/01_프레젠테이션_강의/lremettre사업설명자료 8.4(세미나용).pptx
