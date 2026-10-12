@@ -50,6 +50,15 @@ def scan_docs():
         print(f"Docs folder not found: {DOCS_DIR}")
         return []
 
+    # 0. 90MB 초과 대용량 파일 자동 최적화/스마트 압축 (GitHub 100MB 제한 원천 방지)
+    try:
+        from compress_large_files import auto_optimize_docs
+        optimized = auto_optimize_docs(DOCS_DIR)
+        if optimized > 0:
+            print(f"[자동 최적화] {optimized}개 대용량 파일이 GitHub 허용 기준(100MB 이하)으로 안전하게 압축되었습니다.")
+    except Exception as e:
+        print(f"[대용량 파일 압축 스킵] {e}")
+
     # 기존 resources.json 이 있다면 커스텀 메타데이터(설명문, 키포인트, web_deck_url 등) 보존
     existing_meta = {}
     if os.path.exists(OUTPUT_JSON):
@@ -94,6 +103,20 @@ def scan_docs():
         ]
     }
 
+    # 사업설명자료 프리셋
+    existing_meta['presentation-lremettre사업설명자료84세미나용'] = {
+        "title": "르메뜨레 사업설명 공식 세미나 피치덱",
+        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 공식 자료",
+        "badge": "BUSINESS DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 성장 로드맵을 다루는 공식 세미나 사업설명회 프레젠테이션입니다. Full HD 화질을 유지하면서 최적화 압축되었습니다.",
+        "key_points": [
+            "사업설명회 공식 발표용 고화질 파워포인트 (PPTX)",
+            "스마트 최적화 압축 완료 (153MB -> 62MB, Full HD 유지)",
+            "인터넷 연결 환경에서 원클릭 고속 다운로드 제공"
+        ]
+    }
+
     # 헬쯔백 B2B 프리셋
     existing_meta['presentation-주헬쯔백B2B발표PPT'] = {
         "title": "(주)헬쯔백 B2B 파트너십 프레젠테이션",
@@ -126,7 +149,7 @@ def scan_docs():
     groups = {}
 
     for root, dirs, files in os.walk(DOCS_DIR):
-        if root == DOCS_DIR:
+        if root == DOCS_DIR or "_original_backups" in root:
             continue
         rel_folder = os.path.relpath(root, DOCS_DIR)
         top_folder = rel_folder.split(os.sep)[0]

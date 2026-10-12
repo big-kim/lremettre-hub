@@ -155,10 +155,10 @@
           </div>
 
           <div class="reboom-action-box">
-            <h4>💡 실시간 16:9 와이드 발표</h4>
+            <h4>💡 실시간 프레젠테이션</h4>
             <p>PDF 설치 없이 F11 전체화면으로 즉시 발표</p>
             <a href="${REBOOM_VIEWER_URL}" target="_blank" class="btn-primary-glow" style="padding: 12px 28px; font-size: 14.5px;">
-              <span>🚀</span> REBOOM 발표 시작 (19장)
+              <span>🚀</span> REBOOM 발표 시작
             </a>
             <a href="${REBOOM_PDF_URL}" download class="btn-download-pill" style="margin-top: 4px;">
               <span>💾</span> 원본 PDF 다운로드 (13.7 MB)
@@ -189,7 +189,7 @@
       }
       if (heroMainCta) {
         heroMainCta.href = 'presentation.html';
-        heroMainCta.innerHTML = '<span>🚀</span> 전체화면 프레젠테이션 시작 (F11 자동지원)';
+        heroMainCta.innerHTML = '<span>🚀</span> 프레젠테이션 시작';
       }
       if (stagePrevBtn) stagePrevBtn.style.visibility = 'visible';
       if (stageNextBtn) stageNextBtn.style.visibility = 'visible';
@@ -203,7 +203,7 @@
       }
       if (heroMainCta) {
         heroMainCta.href = REBOOM_VIEWER_URL;
-        heroMainCta.innerHTML = '<span>🚀</span> REBOOM 프로젝트 발표 시작 (19장)';
+        heroMainCta.innerHTML = '<span>🚀</span> REBOOM 발표 시작';
       }
       if (stagePrevBtn) stagePrevBtn.style.visibility = 'hidden';
       if (stageNextBtn) stageNextBtn.style.visibility = 'hidden';
@@ -351,7 +351,7 @@
 
         const launchBtn = webDeckUrl
           ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
-              <span>🚀</span> 라이브 프레젠테이션 시작 (16:9)
+              <span>🚀</span> 프레젠테이션 시작
             </a>`
           : '';
 

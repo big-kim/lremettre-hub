@@ -30,8 +30,9 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Auto-Sync docs folders to resources.json
+      - name: Install dependencies & Auto-Sync docs
         run: |
+          pip install Pillow
           python sync_resources.py
 
       - name: Setup Pages
