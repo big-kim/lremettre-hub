@@ -59,6 +59,36 @@ def scan_docs():
     except Exception as e:
         print(f"[대용량 파일 압축 스킵] {e}")
 
+    # 0-1. PPTX 파일 중 PDF가 없는 파일 자동 PDF 변환 (웹 뷰어 프레젠테이션 시작 버튼 100% 보장)
+    try:
+        import win32com.client
+        ppt_app = None
+        for r_root, r_dirs, r_files in os.walk(DOCS_DIR):
+            if "_original_backups" in r_root:
+                continue
+            for rf in r_files:
+                if rf.lower().endswith('.pptx') and not rf.startswith('~$'):
+                    rf_path = os.path.join(r_root, rf)
+                    target_pdf = os.path.join(r_root, os.path.splitext(rf)[0] + '.pdf')
+                    if not os.path.exists(target_pdf):
+                        try:
+                            if ppt_app is None:
+                                ppt_app = win32com.client.Dispatch("PowerPoint.Application")
+                            print(f"[PPTX -> PDF 자동 변환] {rf}...")
+                            pres = ppt_app.Presentations.Open(os.path.abspath(rf_path), WithWindow=False)
+                            pres.SaveAs(os.path.abspath(target_pdf), 32)
+                            pres.Close()
+                            print(f" -> 변환 완료: {os.path.basename(target_pdf)}")
+                        except Exception as c_err:
+                            print(f" -> 변환 실패: {c_err}")
+        if ppt_app:
+            try:
+                ppt_app.Quit()
+            except Exception:
+                pass
+    except Exception as e:
+        pass
+
     # 기존 resources.json 이 있다면 커스텀 메타데이터(설명문, 키포인트, web_deck_url 등) 보존
     existing_meta = {}
     if os.path.exists(OUTPUT_JSON):

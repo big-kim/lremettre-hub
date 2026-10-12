@@ -347,13 +347,25 @@
           downloadBtnsHtml = `<div class="card-download-group">${btns.join('')}</div>`;
         }
 
-        const webDeckUrl = item.web_deck_url || (item.downloads && item.downloads.pdf ? `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}` : null);
+        let webDeckUrl = item.web_deck_url;
+        if (!webDeckUrl && item.downloads) {
+          if (item.downloads.pdf) {
+            webDeckUrl = `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}`;
+          } else if (item.downloads.pptx) {
+            const rawUrl = window.location.origin + window.location.pathname.replace('index.html', '') + item.downloads.pptx.url;
+            webDeckUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(rawUrl)}`;
+          }
+        }
 
         const launchBtn = webDeckUrl
           ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
               <span>🚀</span> 프레젠테이션 시작
             </a>`
-          : '';
+          : (item.downloads && (item.downloads.pptx || item.downloads.pdf)
+              ? `<a href="${(item.downloads.pptx || item.downloads.pdf).url}" class="btn-deck-launch" target="_blank" title="프레젠테이션 열기">
+                  <span>🚀</span> 프레젠테이션 시작
+                </a>`
+              : '');
 
         return `
           <article class="resource-card" id="card-${item.id}">
