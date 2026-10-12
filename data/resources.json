@@ -34,5 +34,32 @@
     "web_deck_url": "presentation.html",
     "author": "유정환 교수 / L.REMETTRE",
     "slide_count": 16
+  },
+  {
+    "id": "presentation-REBOOM프로젝트PPT",
+    "category": "presentation",
+    "category_name": "프레젠테이션 & 강의",
+    "title": "REBOOM 프로젝트 PPT",
+    "subtitle": "",
+    "version": "v1.0",
+    "date": "2026-10-12",
+    "badge": "강의/발표",
+    "tags": [
+      "프레젠테이션 & 강의",
+      "v1.0"
+    ],
+    "description": "프레젠테이션 & 강의 공식 자료입니다. 브라우저에서 열람하거나 다운로드하여 프레젠테이션 및 업무에 활용하세요.",
+    "key_points": [
+      "공식 파일 포맷 지원: PDF",
+      "최신 업데이트 일자: 2026-10-12",
+      "인터넷 연결 환경에서 원클릭 조회 및 다운로드 가능"
+    ],
+    "downloads": {
+      "pdf": {
+        "url": "docs/01_프레젠테이션_강의/REBOOM 프로젝트 PPT.pdf",
+        "name": "REBOOM 프로젝트 PPT.pdf",
+        "size": "57.5 MB"
+      }
+    }
   }
 ]
