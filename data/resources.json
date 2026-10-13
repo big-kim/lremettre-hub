@@ -66,40 +66,6 @@
     "slide_count": 27
   },
   {
-    "id": "presentation-lremettre사업설명자료84세미나용",
-    "category": "presentation",
-    "category_name": "프레젠테이션 & 강의",
-    "title": "르메뜨레 사업설명 공식 세미나 피치덱",
-    "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 공식 자료",
-    "version": "v1.0",
-    "date": "2026-10-12",
-    "badge": "BUSINESS DECK",
-    "tags": [
-      "프레젠테이션 & 강의",
-      "v1.0"
-    ],
-    "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 성장 로드맵을 다루는 공식 세미나 사업설명회 프레젠테이션입니다. Full HD 화질을 유지하면서 최적화 압축되었습니다.",
-    "key_points": [
-      "사업설명회 공식 발표용 고화질 파워포인트 (PPTX)",
-      "스마트 최적화 압축 완료 (153MB -> 62MB, Full HD 유지)",
-      "인터넷 연결 환경에서 원클릭 고속 다운로드 제공"
-    ],
-    "downloads": {
-      "pdf": {
-        "url": "docs/01_프레젠테이션_강의/lremettre사업설명자료 8.4(세미나용).pdf",
-        "name": "lremettre사업설명자료 8.4(세미나용).pdf",
-        "size": "15.2 MB"
-      },
-      "pptx": {
-        "url": "docs/01_프레젠테이션_강의/lremettre사업설명자료 8.4(세미나용).pptx",
-        "name": "lremettre사업설명자료 8.4(세미나용).pptx",
-        "size": "62.1 MB"
-      }
-    },
-    "web_deck_url": "viewer.html?file=docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/lremettre%EC%82%AC%EC%97%85%EC%84%A4%EB%AA%85%EC%9E%90%EB%A3%8C%208.4%28%EC%84%B8%EB%AF%B8%EB%82%98%EC%9A%A9%29.pdf&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EC%82%AC%EC%97%85%EC%84%A4%EB%AA%85%20%EA%B3%B5%EC%8B%9D%20%EC%84%B8%EB%AF%B8%EB%82%98%20%ED%94%BC%EC%B9%98%EB%8D%B1",
-    "author": "L.REMETTRE BUSINESS GROUP"
-  },
-  {
     "id": "presentation-REBOOM프로젝트PPT",
     "category": "presentation",
     "category_name": "프레젠테이션 & 강의",
