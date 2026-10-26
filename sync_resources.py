@@ -147,6 +147,35 @@ def scan_docs():
         ]
     }
 
+    # 사업설명자료 V1.2 프리셋
+    existing_meta['presentation-lremettre사업설명자료세미나용V12'] = {
+        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.2 최신판)",
+        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 자료",
+        "badge": "LATEST DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 공식 사업설명회 최신 V1.2 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
+        "key_points": [
+            "2026 최신 V1.2 공식 사업설명회 세미나 덱",
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "Full HD 화질 유지 스마트 최적화 압축 (50.5MB) 완료",
+            "공식 고화질 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
+    # 사업설명자료 V1.0 프리셋
+    existing_meta['presentation-lremettre사업설명자료세미나용V10'] = {
+        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.0)",
+        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 공식 세미나 자료",
+        "badge": "BUSINESS DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레 비즈니스 모델 및 사업 비전을 다루는 공식 세미나 V1.0 프레젠테이션입니다. 웹 뷰어에서 바로 발표할 수 있습니다.",
+        "key_points": [
+            "공식 사업설명회 세미나 프레젠테이션 (V1.0)",
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "공식 고화질 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
     # 헬쯔백 B2B 프리셋
     existing_meta['presentation-주헬쯔백B2B발표PPT'] = {
         "title": "(주)헬쯔백 B2B 파트너십 프레젠테이션",
