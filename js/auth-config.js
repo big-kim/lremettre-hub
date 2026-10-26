@@ -18,9 +18,9 @@ window.LREMETTRE_AUTH = {
   // 보안 안내 라벨
   title: "L.REMETTRE SECURITY ACCESS",
   
-  // 인증 후 현재 브라우저 세션 동안 추가 입력 없이 다운로드 허용 여부 (UX 최적화)
-  sessionAuth: true,
+  // 다운로드 시마다 매회 비밀번호 입력 요구 여부 (false: 다운로드 시마다 비밀번호 필수 입력)
+  sessionAuth: false,
   
-  // 세션 스토리지 키
+  // 세션 스토리지 키 (세션 유지 비활성화 시 자동 파기)
   storageKey: "lremettre_verified_session_token"
 };

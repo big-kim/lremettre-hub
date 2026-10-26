@@ -47,6 +47,14 @@
 
     if (!modalBackdrop) return;
 
+    // sessionAuth가 비활성화된 경우, 이전에 남아있을 수 있는 세션 키를 즉시 초기화/삭제
+    const config = window.LREMETTRE_AUTH || {};
+    if (!config.sessionAuth && config.storageKey) {
+      try {
+        sessionStorage.removeItem(config.storageKey);
+      } catch (e) {}
+    }
+
     // 모달 닫기 이벤트 바인딩
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
@@ -116,9 +124,9 @@
   function openAuthModal(fileInfo) {
     pendingDownload = fileInfo;
 
-    // 세션 인증이 이미 완료된 경우 바로 다운로드 허용
+    // sessionAuth가 명시적으로 true인 경우에만 이전 인증을 재사용, 기본값은 매회 비밀번호 입력
     const config = window.LREMETTRE_AUTH || {};
-    if (config.sessionAuth && sessionStorage.getItem(config.storageKey) === 'verified') {
+    if (config.sessionAuth === true && sessionStorage.getItem(config.storageKey) === 'verified') {
       executeDownload(fileInfo);
       showDownloadToast(fileInfo.name);
       return;
@@ -172,9 +180,13 @@
     const isCorrect = (inputHash && inputHash === config.hash) || (inputVal === '7485');
 
     if (isCorrect) {
-      // 인증 성공!
-      if (config.sessionAuth) {
+      // 인증 성공! sessionAuth가 명시적 true일 때만 세션 스토리지에 유지, 아니면 즉시 파기
+      if (config.sessionAuth === true) {
         sessionStorage.setItem(config.storageKey, 'verified');
+      } else if (config.storageKey) {
+        try {
+          sessionStorage.removeItem(config.storageKey);
+        } catch (e) {}
       }
 
       if (submitBtn) {
