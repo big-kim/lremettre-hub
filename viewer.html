@@ -317,8 +317,8 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const rawPdfFile = urlParams.get('file') || 'docs/01_프레젠테이션_강의/REBOOM 프로젝트 PPT.pdf';
-      const verParam = urlParams.get('v') || '';
-      const pdfFile = verParam ? `${rawPdfFile}${rawPdfFile.includes('?') ? '&' : '?'}v=${verParam}` : rawPdfFile;
+      const verParam = urlParams.get('v') || '202611031708';
+      const pdfFile = `${rawPdfFile}${rawPdfFile.includes('?') ? '&' : '?'}v=${verParam}`;
       const fileTypeParam = urlParams.get('type') || '';
       const isVideoMode = fileTypeParam === 'video' || /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(rawPdfFile);
       const deckTitle = urlParams.get('title') || rawPdfFile.split('/').pop().replace(/\.(pdf|mp4|webm|mov|m4v)$/i, '');
