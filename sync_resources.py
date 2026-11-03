@@ -75,11 +75,13 @@ def scan_docs():
                 if rf.lower().endswith('.pptx') and not rf.startswith('~$'):
                     rf_path = os.path.join(r_root, rf)
                     target_pdf = os.path.join(r_root, os.path.splitext(rf)[0] + '.pdf')
-                    if not os.path.exists(target_pdf):
+                    need_convert = (not os.path.exists(target_pdf)) or (os.path.getmtime(rf_path) > os.path.getmtime(target_pdf) + 2)
+                    if need_convert:
                         try:
                             if ppt_app is None:
                                 ppt_app = win32com.client.Dispatch("PowerPoint.Application")
-                            print(f"[PPTX -> PDF 자동 변환] {rf}...")
+                            reason = "신규 생성" if not os.path.exists(target_pdf) else "PPTX 수정 감지 -> PDF 재변환"
+                            print(f"[PPTX -> PDF 자동 변환 ({reason})] {rf}...")
                             pres = ppt_app.Presentations.Open(os.path.abspath(rf_path), WithWindow=False)
                             pres.SaveAs(os.path.abspath(target_pdf), 32)
                             pres.Close()
@@ -406,9 +408,11 @@ def scan_docs():
         if "web_deck_url" in preset:
             item["web_deck_url"] = preset["web_deck_url"]
         elif "pdf" in ginfo["files"]:
+            pdf_abs = os.path.join(SCRIPT_DIR, ginfo["files"]["pdf"]["url"])
+            ver_ts = int(os.path.getmtime(pdf_abs)) if os.path.exists(pdf_abs) else 1
             encoded_pdf = urllib.parse.quote(ginfo["files"]["pdf"]["url"])
             encoded_title = urllib.parse.quote(title)
-            item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}"
+            item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}&v={ver_ts}"
         elif "video" in ginfo["files"]:
             encoded_video = urllib.parse.quote(ginfo["files"]["video"]["url"])
             encoded_title = urllib.parse.quote(title)

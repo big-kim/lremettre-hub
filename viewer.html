@@ -316,10 +316,12 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
       const urlParams = new URLSearchParams(window.location.search);
-      const pdfFile = urlParams.get('file') || 'docs/01_프레젠테이션_강의/REBOOM 프로젝트 PPT.pdf';
+      const rawPdfFile = urlParams.get('file') || 'docs/01_프레젠테이션_강의/REBOOM 프로젝트 PPT.pdf';
+      const verParam = urlParams.get('v') || '';
+      const pdfFile = verParam ? `${rawPdfFile}${rawPdfFile.includes('?') ? '&' : '?'}v=${verParam}` : rawPdfFile;
       const fileTypeParam = urlParams.get('type') || '';
-      const isVideoMode = fileTypeParam === 'video' || /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(pdfFile);
-      const deckTitle = urlParams.get('title') || pdfFile.split('/').pop().replace(/\.(pdf|mp4|webm|mov|m4v)$/i, '');
+      const isVideoMode = fileTypeParam === 'video' || /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(rawPdfFile);
+      const deckTitle = urlParams.get('title') || rawPdfFile.split('/').pop().replace(/\.(pdf|mp4|webm|mov|m4v)$/i, '');
 
       let pdfDoc = null;
       let pageNum = 1;
