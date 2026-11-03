@@ -483,6 +483,9 @@
     } else if (type === 'image' || type === 'png' || type === 'jpg') {
       icon = '🖼️';
       label = 'Image';
+    } else if (type === 'video' || type === 'mp4' || type === 'webm' || type === 'mov') {
+      icon = '🎬';
+      label = 'MP4 영상';
     }
 
     return `
@@ -530,28 +533,37 @@
         }
 
         let webDeckUrl = item.web_deck_url;
+        const isVideoItem = item.category === 'video' || (item.downloads && Boolean(item.downloads.video) && !item.downloads.pdf && !item.downloads.pptx);
+
         if (!webDeckUrl && item.downloads) {
           if (item.downloads.pdf) {
             webDeckUrl = `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}`;
+          } else if (item.downloads.video) {
+            webDeckUrl = `viewer.html?file=${encodeURIComponent(item.downloads.video.url)}&title=${encodeURIComponent(item.title)}&type=video`;
           } else if (item.downloads.pptx) {
             const rawUrl = window.location.origin + window.location.pathname.replace('index.html', '') + item.downloads.pptx.url;
             webDeckUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(rawUrl)}`;
           }
         }
 
+        const launchLabel = isVideoItem ? '영상 바로 재생' : '프레젠테이션 시작';
+        const launchIcon = isVideoItem ? '🎬' : '🚀';
+
         const launchBtn = webDeckUrl
-          ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 발표하기">
-              <span>🚀</span> 프레젠테이션 시작
+          ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 열기">
+              <span>${launchIcon}</span> ${launchLabel}
             </a>`
-          : (item.downloads && (item.downloads.pptx || item.downloads.pdf)
-              ? `<a href="${(item.downloads.pptx || item.downloads.pdf).url}" class="btn-deck-launch" target="_blank" title="프레젠테이션 열기">
-                  <span>🚀</span> 프레젠테이션 시작
+          : (item.downloads && (item.downloads.pptx || item.downloads.pdf || item.downloads.video)
+              ? `<a href="${(item.downloads.pptx || item.downloads.pdf || item.downloads.video).url}" class="btn-deck-launch" target="_blank" title="열기">
+                  <span>${launchIcon}</span> ${launchLabel}
                 </a>`
               : '');
 
         // 16:9 썸네일 그래픽 설정
         const badgeText = item.badge || item.category_name;
-        const pageCountBadge = item.slide_count ? `${item.slide_count}P` : (item.version || 'v1.0');
+        const pageCountBadge = item.slide_count ? `${item.slide_count}P` : (isVideoItem ? 'HD VIDEO' : (item.version || 'v1.0'));
+        const thumbCenterIcon = isVideoItem ? '🎬' : (item.category === 'presentation' ? '📽️' : '📑');
+        const thumbDeckType = isVideoItem ? 'FULL HD MEDIA' : '16:9 WIDESCREEN';
 
         return `
           <article class="resource-card" id="card-${item.id}">
@@ -561,8 +573,8 @@
                 <div class="card-thumb-bg">
                   <img src="assets/logo/lremettre_emblem.png" alt="L.ReMeTTRE" class="thumb-watermark">
                   <div class="thumb-center-badge">
-                    <span class="thumb-glow-icon">${item.category === 'presentation' ? '📽️' : '📑'}</span>
-                    <span class="thumb-deck-type">16:9 WIDESCREEN</span>
+                    <span class="thumb-glow-icon">${thumbCenterIcon}</span>
+                    <span class="thumb-deck-type">${thumbDeckType}</span>
                   </div>
                 </div>
 
@@ -572,11 +584,11 @@
                 </div>
 
                 ${webDeckUrl ? `
-                  <a href="${webDeckUrl}" class="card-thumb-hover-link" target="_blank" title="클릭 시 프레젠테이션 바로보기">
+                  <a href="${webDeckUrl}" class="card-thumb-hover-link" target="_blank" title="클릭 시 바로보기">
                     <div class="hover-play-circle">
                       <span>▶</span>
                     </div>
-                    <span class="hover-play-label">프레젠테이션 시작</span>
+                    <span class="hover-play-label">${launchLabel}</span>
                   </a>
                 ` : ''}
               </div>

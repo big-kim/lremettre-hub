@@ -100,23 +100,53 @@
     "slide_count": 27
   },
   {
+    "id": "presentation-lremettre사업설명자료세미나용V14",
+    "category": "presentation",
+    "category_name": "프레젠테이션 & 강의",
+    "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)",
+    "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 공식 자료",
+    "version": "V1.4",
+    "date": "2026-11-03",
+    "badge": "LATEST DECK",
+    "tags": [
+      "프레젠테이션 & 강의",
+      "V1.4"
+    ],
+    "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 50페이지 공식 사업설명회 최신 V1.4 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
+    "key_points": [
+      "2026 최신 V1.4 공식 사업설명회 세미나 덱 (50P)",
+      "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+      "고화질 공식 PDF 원본 즉시 다운로드 제공"
+    ],
+    "downloads": {
+      "pdf": {
+        "url": "docs/01_프레젠테이션_강의/lremettre사업설명자료_세미나용_V1.4.pdf",
+        "name": "lremettre사업설명자료_세미나용_V1.4.pdf",
+        "size": "71.1 MB"
+      }
+    },
+    "web_deck_url": "viewer.html?file=docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/lremettre%EC%82%AC%EC%97%85%EC%84%A4%EB%AA%85%EC%9E%90%EB%A3%8C_%EC%84%B8%EB%AF%B8%EB%82%98%EC%9A%A9_V1.4.pdf&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EC%82%AC%EC%97%85%EC%84%A4%EB%AA%85%20%EA%B3%B5%EC%8B%9D%20%EC%84%B8%EB%AF%B8%EB%82%98%20%ED%94%BC%EC%B9%98%EB%8D%B1%20%28V1.4%20%EC%B5%9C%EC%8B%A0%ED%8C%90%29",
+    "author": "L.REMETTRE BUSINESS GROUP",
+    "slide_count": 50
+  },
+  {
     "id": "presentation-르메뜨레세미나OfficialV30",
     "category": "presentation",
     "category_name": "프레젠테이션 & 강의",
-    "title": "르메뜨레 세미나 Official V3.0",
-    "subtitle": "",
+    "title": "르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)",
+    "subtitle": "르메뜨레 브랜드 · 3대 핵심 바이오 솔루션 · 세미나 공식 발표 자료",
     "version": "V3.0",
     "date": "2026-11-03",
-    "badge": "강의/발표",
+    "badge": "OFFICIAL V3.0",
     "tags": [
       "프레젠테이션 & 강의",
       "V3.0"
     ],
-    "description": "프레젠테이션 & 강의 공식 자료입니다. 브라우저에서 열람하거나 다운로드하여 프레젠테이션 및 업무에 활용하세요.",
+    "description": "르메뜨레의 핵심 제품 라인업과 과학적 메커니즘, 세미나 핵심 내용을 집약한 Official V3.0 공식 발표 자료입니다. 웹 뷰어 발표 및 PPTX/PDF 다운로드를 모두 지원합니다.",
     "key_points": [
-      "공식 파일 포맷 지원: PDF, PPTX",
-      "최신 업데이트 일자: 2026-11-03",
-      "인터넷 연결 환경에서 원클릭 조회 및 다운로드 가능"
+      "Official V3.0 최신 공식 세미나 프레젠테이션",
+      "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+      "편집 가능한 원본 PPTX 및 고화질 PDF 동시 제공"
     ],
     "downloads": {
       "pdf": {
@@ -130,6 +160,65 @@
         "size": "49.8 MB"
       }
     },
-    "web_deck_url": "viewer.html?file=docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EC%84%B8%EB%AF%B8%EB%82%98_Official_V3.0.pdf&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EC%84%B8%EB%AF%B8%EB%82%98%20Official%20V3.0"
+    "web_deck_url": "viewer.html?file=docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EC%84%B8%EB%AF%B8%EB%82%98_Official_V3.0.pdf&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%EA%B3%B5%EC%8B%9D%20%EC%84%B8%EB%AF%B8%EB%82%98%20%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98%20%28Official%20V3.0%29",
+    "author": "L.REMETTRE BUSINESS GROUP"
+  },
+  {
+    "id": "video-02르메뜨레회원인바디건강다큐HUD비실명판",
+    "category": "video",
+    "category_name": "영상 자료",
+    "title": "르메뜨레 회원 인바디 변화 건강다큐 (HUD 비실명판)",
+    "subtitle": "실제 회원 체성분·내장지방·세포영양 데이터 분석 다큐멘터리 영상",
+    "version": "v1.0",
+    "date": "2026-10-29",
+    "badge": "DOCU VIDEO",
+    "tags": [
+      "영상 자료",
+      "v1.0"
+    ],
+    "description": "르메뜨레 3-Step 바이오 솔루션 섭취 전후 실제 회원의 인바디(InBody) 체성분 및 내장지방 변화 추이를 시네마틱 HUD 그래픽으로 정밀 분석한 건강 다큐멘터리 영상(비실명판)입니다.",
+    "key_points": [
+      "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
+      "회원 보호를 위한 비실명 처리 완료본",
+      "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
+    ],
+    "downloads": {
+      "video": {
+        "url": "docs/05_영상 자료/02_르메뜨레_회원_인바디_건강다큐_HUD_비실명판.mp4",
+        "name": "02_르메뜨레_회원_인바디_건강다큐_HUD_비실명판.mp4",
+        "size": "17.1 MB"
+      }
+    },
+    "web_deck_url": "viewer.html?file=docs/05_%EC%98%81%EC%83%81%20%EC%9E%90%EB%A3%8C/02_%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88_%ED%9A%8C%EC%9B%90_%EC%9D%B8%EB%B0%94%EB%94%94_%EA%B1%B4%EA%B0%95%EB%8B%A4%ED%81%90_HUD_%EB%B9%84%EC%8B%A4%EB%AA%85%ED%8C%90.mp4&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%ED%9A%8C%EC%9B%90%20%EC%9D%B8%EB%B0%94%EB%94%94%20%EB%B3%80%ED%99%94%20%EA%B1%B4%EA%B0%95%EB%8B%A4%ED%81%90%20%28HUD%20%EB%B9%84%EC%8B%A4%EB%AA%85%ED%8C%90%29&type=video",
+    "author": "L.REMETTRE MEDIA GROUP"
+  },
+  {
+    "id": "video-04르메뜨레회원혈액검진클린V2비실명판",
+    "category": "video",
+    "category_name": "영상 자료",
+    "title": "르메뜨레 회원 혈액검진 데이터 분석 (클린 V2 비실명판)",
+    "subtitle": "실제 회원 혈액검진 지표 개선 사례 시네마틱 브리핑 영상",
+    "version": "V2",
+    "date": "2026-11-03",
+    "badge": "CLINICAL VIDEO",
+    "tags": [
+      "영상 자료",
+      "V2"
+    ],
+    "description": "실제 회원의 건강검진 혈액 지표 변화를 객관적 수치와 시각 데이터로 알기 쉽게 정리한 클린 V2 브리핑 영상(비실명판)입니다. 브라우저에서 즉시 전체화면 재생이 가능합니다.",
+    "key_points": [
+      "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
+      "혈액검진 핵심 지표 전후 비교 클린 V2 에디션 (비실명판)",
+      "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
+    ],
+    "downloads": {
+      "video": {
+        "url": "docs/05_영상 자료/04_르메뜨레_회원_혈액검진_클린V2_비실명판.mp4",
+        "name": "04_르메뜨레_회원_혈액검진_클린V2_비실명판.mp4",
+        "size": "9.6 MB"
+      }
+    },
+    "web_deck_url": "viewer.html?file=docs/05_%EC%98%81%EC%83%81%20%EC%9E%90%EB%A3%8C/04_%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88_%ED%9A%8C%EC%9B%90_%ED%98%88%EC%95%A1%EA%B2%80%EC%A7%84_%ED%81%B4%EB%A6%B0V2_%EB%B9%84%EC%8B%A4%EB%AA%85%ED%8C%90.mp4&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%ED%9A%8C%EC%9B%90%20%ED%98%88%EC%95%A1%EA%B2%80%EC%A7%84%20%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EB%B6%84%EC%84%9D%20%28%ED%81%B4%EB%A6%B0%20V2%20%EB%B9%84%EC%8B%A4%EB%AA%85%ED%8C%90%29&type=video",
+    "author": "L.REMETTRE MEDIA GROUP"
   }
 ]

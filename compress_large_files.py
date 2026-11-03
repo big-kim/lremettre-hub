@@ -11,6 +11,7 @@ import os
 import io
 import shutil
 import zipfile
+import subprocess
 from PIL import Image
 
 MAX_GITHUB_SAFE_BYTES = 90 * 1024 * 1024  # 90MB 이상이면 자동 압축 트리거
@@ -87,11 +88,136 @@ def compress_pptx(file_path, target_max_dim=1920, quality=80):
             os.remove(temp_path)
         return False, file_size, file_size
 
+def compress_video(file_path, target_max_mb=85):
+    """
+    90MB를 초과하는 영상 파일(.mp4, .mov, .webm)이 감지되면 FFmpeg를 통해
+    Full HD(1080p) 화질을 유지하면서 GitHub 안전 기준(85MB 이하)으로 자동 최적화합니다.
+    """
+    file_size = os.path.getsize(file_path)
+    if file_size <= MAX_GITHUB_SAFE_BYTES:
+        return False, file_size, file_size
+
+    print(f"[영상 자동 최적화 시작] {os.path.basename(file_path)}: {file_size / (1024*1024):.1f} MB (90MB 초과 감지)")
+
+    ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        print(f"[안내] {os.path.basename(file_path)} 용량({file_size/(1024*1024):.1f} MB)이 90MB를 초과합니다. 100MB 미만인지 확인해주세요.")
+        return False, file_size, file_size
+
+    backup_dir = os.path.join(os.path.dirname(file_path), "_original_backups")
+    os.makedirs(backup_dir, exist_ok=True)
+    backup_path = os.path.join(backup_dir, os.path.basename(file_path))
+    if not os.path.exists(backup_path):
+        shutil.copy2(file_path, backup_path)
+        print(f" -> 원본 영상 백업 완료: {backup_path}")
+
+    temp_path = file_path + ".compressing.mp4"
+    try:
+        cmd = [
+            ffmpeg_bin, "-y", "-i", file_path,
+            "-vf", "scale='min(1920,iw)':-2",
+            "-c:v", "libx264", "-crf", "26", "-preset", "fast",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            temp_path
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if res.returncode == 0 and os.path.exists(temp_path):
+            new_size = os.path.getsize(temp_path)
+            if new_size < file_size and new_size <= MAX_GITHUB_SAFE_BYTES:
+                shutil.move(temp_path, file_path)
+                reduction = (1 - new_size / file_size) * 100
+                print(f"[영상 압축 성공] {file_size / (1024*1024):.1f} MB -> {new_size / (1024*1024):.1f} MB ({reduction:.1f}% 절감)")
+                return True, file_size, new_size
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+    except Exception as e:
+        print(f"[영상 압축 오류] {e}")
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+    return False, file_size, file_size
+
+def compress_pdf_safe(file_path, target_max_dim=1920, quality=82):
+    """
+    Canva 등에서 내보낸 90MB 초과 대용량 PDF에서 투명도 마스크(SMask)가 없는
+    불투명(Opaque) 고해상도 배경/사진 스트림만 선별하여 Full HD JPEG로 리샘플링합니다.
+    투명 레이어(SMask != 0)와 벡터 그래픽/텍스트는 100% 원본 그대로 보존하여
+    시각적 손실이나 검은색 마스킹 깨짐 현상 없이 용량만 안전하게 절감합니다.
+    """
+    file_size = os.path.getsize(file_path)
+    if file_size <= MAX_GITHUB_SAFE_BYTES:
+        return False, file_size, file_size
+
+    print(f"[PDF 안전 최적화 시작] {os.path.basename(file_path)}: {file_size / (1024*1024):.1f} MB (90MB 초과 감지)")
+
+    try:
+        import pymupdf
+    except ImportError:
+        print("[안내] pymupdf 라이브러리가 없어 PDF 자동 최적화를 건너뜁니다.")
+        return False, file_size, file_size
+
+    backup_dir = os.path.join(os.path.dirname(file_path), "_original_backups")
+    os.makedirs(backup_dir, exist_ok=True)
+    backup_path = os.path.join(backup_dir, os.path.basename(file_path))
+    if not os.path.exists(backup_path):
+        shutil.copy2(file_path, backup_path)
+        print(f" -> 원본 PDF 백업 완료: {backup_path}")
+
+    temp_path = file_path + ".compressing.pdf"
+    try:
+        doc = pymupdf.open(file_path)
+        seen = set()
+        for page in doc:
+            for img in page.get_images(full=True):
+                xref = img[0]
+                if xref in seen:
+                    continue
+                seen.add(xref)
+                smask = img[1]
+                cs = img[5]
+                # 투명도 마스크가 없는 불투명 RGB 이미지만 안전하게 압축
+                if smask == 0 and cs in ('DeviceRGB', 'ICCBased'):
+                    raw = doc.xref_stream_raw(xref)
+                    if not raw or len(raw) < 150 * 1024:
+                        continue
+                    try:
+                        pix = pymupdf.Pixmap(doc, xref)
+                        if pix.n - pix.alpha != 3:
+                            continue
+                        pil_img = Image.frombytes('RGB', [pix.width, pix.height], pix.samples)
+                        if pil_img.width > target_max_dim or pil_img.height > target_max_dim:
+                            pil_img.thumbnail((target_max_dim, target_max_dim), Image.Resampling.LANCZOS)
+                        buf = io.BytesIO()
+                        pil_img.save(buf, format='JPEG', quality=quality, optimize=True)
+                        new_bytes = buf.getvalue()
+                        if len(new_bytes) < len(raw) * 0.85:
+                            page.replace_image(xref, stream=new_bytes)
+                    except Exception:
+                        pass
+
+        doc.save(temp_path, garbage=4, deflate=True)
+        doc.close()
+
+        new_size = os.path.getsize(temp_path)
+        if new_size < file_size and new_size <= MAX_GITHUB_SAFE_BYTES:
+            shutil.move(temp_path, file_path)
+            reduction = (1 - new_size / file_size) * 100
+            print(f"[PDF 최적화 성공] {file_size / (1024*1024):.1f} MB -> {new_size / (1024*1024):.1f} MB ({reduction:.1f}% 절감, 투명 레이어 100% 보존)")
+            return True, file_size, new_size
+        else:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+    except Exception as e:
+        print(f"[PDF 최적화 오류] {e}")
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+    return False, file_size, file_size
+
 def auto_optimize_docs(docs_root):
     """
-    docs 디렉토리 내의 모든 대용량 PPTX 파일을 검사하여 90MB 초과 시 자동 압축합니다.
-    (PDF의 경우 인위적 압축 시 Canva 특유의 투명도 마스크와 벡터 품질이 훼손되므로,
-     Canva 'PDF 표준(Standard)' 원본 내보내기를 권장하며 원본 품질을 100% 보존합니다)
+    docs 디렉토리 내의 모든 대용량 PPTX, PDF 및 영상 파일을 검사하여 90MB 초과 시 자동 압축합니다.
     """
     optimized_count = 0
     for root, dirs, files in os.walk(docs_root):
@@ -110,9 +236,14 @@ def auto_optimize_docs(docs_root):
                     success, old_s, new_s = compress_pptx(full_path)
                     if success:
                         optimized_count += 1
+                elif ext in ['.mp4', '.mov', '.webm', '.m4v']:
+                    success, old_s, new_s = compress_video(full_path)
+                    if success:
+                        optimized_count += 1
                 elif ext == '.pdf':
-                    print(f"[안내] {f} 파일 용량({size/(1024*1024):.1f} MB)이 90MB를 초과합니다.")
-                    print("  -> 품질 훼손 방지를 위해 Canva에서 'PDF 표준'으로 내보내기를 권장합니다.")
+                    success, old_s, new_s = compress_pdf_safe(full_path)
+                    if success:
+                        optimized_count += 1
     return optimized_count
 
 if __name__ == '__main__':

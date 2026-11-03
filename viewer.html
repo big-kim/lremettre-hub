@@ -138,6 +138,17 @@
       object-fit: contain;
     }
 
+    #video-player {
+      display: none;
+      max-width: 100%;
+      max-height: calc(100vh - 130px);
+      width: auto;
+      height: auto;
+      border-radius: 12px;
+      outline: none;
+      background: #000000;
+    }
+
     /* Loading Spinner */
     #loading-overlay {
       position: absolute;
@@ -273,6 +284,7 @@
   <main id="viewport-shell">
     <div id="canvas-container">
       <canvas id="pdf-canvas"></canvas>
+      <video id="video-player" controls playsinline preload="metadata"></video>
     </div>
 
     <!-- Loading Overlay -->
@@ -283,7 +295,7 @@
   </main>
 
   <!-- Bottom Floating Controller -->
-  <nav class="bottom-hud" aria-label="슬라이드 제어">
+  <nav class="bottom-hud" id="bottom-hud" aria-label="슬라이드 제어">
     <button id="btn-prev" class="hud-nav-btn" title="이전 슬라이드 (←, PageUp)" aria-label="이전 슬라이드">‹</button>
     <div class="slide-counter">
       <span id="counter-current">01</span> <span class="total">/ <span id="counter-total">--</span></span>
@@ -305,7 +317,9 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const pdfFile = urlParams.get('file') || 'docs/01_프레젠테이션_강의/REBOOM 프로젝트 PPT.pdf';
-      const deckTitle = urlParams.get('title') || pdfFile.split('/').pop().replace('.pdf', '');
+      const fileTypeParam = urlParams.get('type') || '';
+      const isVideoMode = fileTypeParam === 'video' || /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(pdfFile);
+      const deckTitle = urlParams.get('title') || pdfFile.split('/').pop().replace(/\.(pdf|mp4|webm|mov|m4v)$/i, '');
 
       let pdfDoc = null;
       let pageNum = 1;
@@ -313,6 +327,9 @@
       let pageNumPending = null;
       const canvas = document.getElementById('pdf-canvas');
       const ctx = canvas.getContext('2d');
+      const videoPlayer = document.getElementById('video-player');
+      const bottomHud = document.getElementById('bottom-hud');
+      const loadingText = document.getElementById('loading-text');
 
       const counterCurrent = document.getElementById('counter-current');
       const counterTotal = document.getElementById('counter-total');
@@ -423,6 +440,39 @@
 
       // Keyboard navigation
       window.addEventListener('keydown', function (e) {
+        if (isVideoMode) {
+          switch (e.key) {
+            case ' ':
+              if (document.activeElement !== videoPlayer) {
+                e.preventDefault();
+                if (videoPlayer.paused) videoPlayer.play();
+                else videoPlayer.pause();
+              }
+              break;
+            case 'ArrowRight':
+              e.preventDefault();
+              videoPlayer.currentTime = Math.min(videoPlayer.duration || 0, videoPlayer.currentTime + 5);
+              break;
+            case 'ArrowLeft':
+              e.preventDefault();
+              videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 5);
+              break;
+            case 'f':
+            case 'F':
+              toggleFullscreen();
+              break;
+            case 't':
+            case 'T':
+              toggleTheme();
+              break;
+            case 'm':
+            case 'M':
+              videoPlayer.muted = !videoPlayer.muted;
+              break;
+          }
+          return;
+        }
+
         switch (e.key) {
           case 'ArrowRight':
           case 'ArrowDown':
@@ -463,10 +513,12 @@
       // Touch navigation
       let touchStartX = 0;
       window.addEventListener('touchstart', (e) => {
+        if (isVideoMode) return;
         touchStartX = e.changedTouches[0].screenX;
       }, { passive: true });
 
       window.addEventListener('touchend', (e) => {
+        if (isVideoMode) return;
         const diffX = e.changedTouches[0].screenX - touchStartX;
         if (Math.abs(diffX) > 40) {
           if (diffX < 0) onNextPage();
@@ -475,7 +527,7 @@
       }, { passive: true });
 
       window.addEventListener('resize', () => {
-        if (pdfDoc) renderPage(pageNum);
+        if (!isVideoMode && pdfDoc) renderPage(pageNum);
       });
 
       prevBtn.addEventListener('click', onPrevPage);
@@ -483,30 +535,63 @@
       themeToggleBtn.addEventListener('click', toggleTheme);
       fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-      // Load Document
-      pdfjsLib.getDocument(pdfFile).promise.then(function (doc) {
-        pdfDoc = doc;
-        counterTotal.textContent = String(doc.numPages).padStart(2, '0');
+      // Video Mode vs PDF Document Mode
+      if (isVideoMode) {
+        canvas.style.display = 'none';
+        videoPlayer.style.display = 'block';
+        if (bottomHud) bottomHud.style.display = 'none';
+        if (loadingText) loadingText.textContent = '공식 홍보 영상을 불러오고 있습니다...';
 
-        // Check hash
-        const hash = window.location.hash;
-        if (hash && hash.startsWith('#')) {
-          const p = parseInt(hash.replace('#', ''), 10);
-          if (!isNaN(p) && p >= 1 && p <= doc.numPages) {
-            pageNum = p;
-          }
+        const titlePill = document.getElementById('deck-title-display');
+        if (titlePill) {
+          titlePill.innerHTML = `<span>🎬</span> <span id="deck-title-text">${deckTitle}</span>`;
         }
 
-        renderPage(pageNum);
-      }).catch(function (error) {
-        console.error('Error loading PDF:', error);
-        loadingOverlay.innerHTML = `
-          <p style="font-size: 24px;">⚠️</p>
-          <p style="font-size: 16px; color: #EF4444; font-weight: 700;">프레젠테이션 문서를 불러오지 못했습니다.</p>
-          <p style="font-size: 13px; color: #94A3B8;">${error.message}</p>
-          <a href="index.html" class="hud-btn" style="margin-top: 12px;">자료실로 돌아가기</a>
-        `;
-      });
+        videoPlayer.src = pdfFile;
+        videoPlayer.addEventListener('loadeddata', function () {
+          loadingOverlay.classList.add('hidden');
+          videoPlayer.play().catch(() => {});
+        });
+        videoPlayer.addEventListener('timeupdate', function () {
+          if (videoPlayer.duration) {
+            const pct = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressFill.style.width = `${pct}%`;
+          }
+        });
+        videoPlayer.addEventListener('error', function () {
+          loadingOverlay.innerHTML = `
+            <p style="font-size: 24px;">⚠️</p>
+            <p style="font-size: 16px; color: #EF4444; font-weight: 700;">영상을 불러오지 못했습니다.</p>
+            <p style="font-size: 13px; color: #94A3B8;">파일 경로 또는 네트워크 상태를 확인해 주세요.</p>
+            <a href="index.html" class="hud-btn" style="margin-top: 12px;">자료실로 돌아가기</a>
+          `;
+        });
+      } else {
+        // Load PDF Document
+        pdfjsLib.getDocument(pdfFile).promise.then(function (doc) {
+          pdfDoc = doc;
+          counterTotal.textContent = String(doc.numPages).padStart(2, '0');
+
+          // Check hash
+          const hash = window.location.hash;
+          if (hash && hash.startsWith('#')) {
+            const p = parseInt(hash.replace('#', ''), 10);
+            if (!isNaN(p) && p >= 1 && p <= doc.numPages) {
+              pageNum = p;
+            }
+          }
+
+          renderPage(pageNum);
+        }).catch(function (error) {
+          console.error('Error loading PDF:', error);
+          loadingOverlay.innerHTML = `
+            <p style="font-size: 24px;">⚠️</p>
+            <p style="font-size: 16px; color: #EF4444; font-weight: 700;">프레젠테이션 문서를 불러오지 못했습니다.</p>
+            <p style="font-size: 13px; color: #94A3B8;">${error.message}</p>
+            <a href="index.html" class="hud-btn" style="margin-top: 12px;">자료실로 돌아가기</a>
+          `;
+        });
+      }
     })();
   </script>
 </body>

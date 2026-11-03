@@ -59,8 +59,18 @@ def main():
         print(f"[동기화 오류] {e}")
         return
 
-    # 2. Git 상태 확인 및 커밋
+    # 2. Git 상태 확인 및 커밋 (이전 푸시 실패로 남은 로컬 커밋이 있으면 소프트 리셋 후 통합 커밋)
     print("\n[2/3] 변경 사항 패키징 및 Git 커밋 중...")
+    try:
+        ahead_check = subprocess.run(
+            ["git", "rev-list", "--count", "origin/main..HEAD"],
+            capture_output=True, text=True, encoding='utf-8'
+        )
+        if ahead_check.returncode == 0 and int(ahead_check.stdout.strip() or "0") > 0:
+            subprocess.run(["git", "reset", "--soft", "origin/main"], capture_output=True)
+    except Exception:
+        pass
+
     run_cmd(["git", "add", "."])
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     commit_msg = f"docs: 르메뜨레 신규 자료 동기화 및 배포 ({now_str})"

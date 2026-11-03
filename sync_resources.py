@@ -25,6 +25,11 @@ CATEGORY_MAP = {
     "brochures": {"category": "brochure", "name": "홍보 & 브로슈어", "badge": "브랜드홍보"},
     "04_공식_서식": {"category": "forms", "name": "공식 서식", "badge": "업무양식"},
     "forms": {"category": "forms", "name": "공식 서식", "badge": "업무양식"},
+    "05_영상 자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
+    "05.영상 자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
+    "05_영상_자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
+    "05_홍보_영상": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
+    "videos": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
 }
 
 def format_size(bytes_size):
@@ -219,6 +224,63 @@ def scan_docs():
         ]
     }
 
+    # 사업설명자료 V1.4 프리셋
+    existing_meta['presentation-lremettre사업설명자료세미나용V14'] = {
+        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)",
+        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 공식 자료",
+        "badge": "LATEST DECK",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "slide_count": 50,
+        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 50페이지 공식 사업설명회 최신 V1.4 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
+        "key_points": [
+            "2026 최신 V1.4 공식 사업설명회 세미나 덱 (50P)",
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "고화질 공식 PDF 원본 즉시 다운로드 제공"
+        ]
+    }
+
+    # 르메뜨레 세미나 Official V3.0 프리셋
+    existing_meta['presentation-르메뜨레세미나OfficialV30'] = {
+        "title": "르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)",
+        "subtitle": "르메뜨레 브랜드 · 3대 핵심 바이오 솔루션 · 세미나 공식 발표 자료",
+        "badge": "OFFICIAL V3.0",
+        "author": "L.REMETTRE BUSINESS GROUP",
+        "description": "르메뜨레의 핵심 제품 라인업과 과학적 메커니즘, 세미나 핵심 내용을 집약한 Official V3.0 공식 발표 자료입니다. 웹 뷰어 발표 및 PPTX/PDF 다운로드를 모두 지원합니다.",
+        "key_points": [
+            "Official V3.0 최신 공식 세미나 프레젠테이션",
+            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
+            "편집 가능한 원본 PPTX 및 고화질 PDF 동시 제공"
+        ]
+    }
+
+    # 영상 02: 회원 인바디 건강다큐 HUD 비실명판 프리셋
+    existing_meta['video-02르메뜨레회원인바디건강다큐HUD비실명판'] = {
+        "title": "르메뜨레 회원 인바디 변화 건강다큐 (HUD 비실명판)",
+        "subtitle": "실제 회원 체성분·내장지방·세포영양 데이터 분석 다큐멘터리 영상",
+        "badge": "DOCU VIDEO",
+        "author": "L.REMETTRE MEDIA GROUP",
+        "description": "르메뜨레 3-Step 바이오 솔루션 섭취 전후 실제 회원의 인바디(InBody) 체성분 및 내장지방 변화 추이를 시네마틱 HUD 그래픽으로 정밀 분석한 건강 다큐멘터리 영상(비실명판)입니다.",
+        "key_points": [
+            "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
+            "회원 보호를 위한 비실명 처리 완료본",
+            "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
+        ]
+    }
+
+    # 영상 04: 회원 혈액검진 클린V2 비실명판 프리셋
+    existing_meta['video-04르메뜨레회원혈액검진클린V2비실명판'] = {
+        "title": "르메뜨레 회원 혈액검진 데이터 분석 (클린 V2 비실명판)",
+        "subtitle": "실제 회원 혈액검진 지표 개선 사례 시네마틱 브리핑 영상",
+        "badge": "CLINICAL VIDEO",
+        "author": "L.REMETTRE MEDIA GROUP",
+        "description": "실제 회원의 건강검진 혈액 지표 변화를 객관적 수치와 시각 데이터로 알기 쉽게 정리한 클린 V2 브리핑 영상(비실명판)입니다. 브라우저에서 즉시 전체화면 재생이 가능합니다.",
+        "key_points": [
+            "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
+            "혈액검진 핵심 지표 전후 비교 클린 V2 에디션 (비실명판)",
+            "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
+        ]
+    }
+
     resources = []
     groups = {}
 
@@ -228,11 +290,12 @@ def scan_docs():
         rel_folder = os.path.relpath(root, DOCS_DIR)
         top_folder = rel_folder.split(os.sep)[0]
 
-        cat_info = CATEGORY_MAP.get(top_folder, {
-            "category": "etc",
-            "name": top_folder,
-            "badge": "일반자료"
-        })
+        cat_info = CATEGORY_MAP.get(top_folder)
+        if not cat_info:
+            if "영상" in top_folder or "video" in top_folder.lower():
+                cat_info = {"category": "video", "name": "영상 자료", "badge": "공식영상"}
+            else:
+                cat_info = {"category": "etc", "name": top_folder, "badge": "일반자료"}
 
         for fname in files:
             # 숨김 파일이나 임시 파일 무시
@@ -243,7 +306,7 @@ def scan_docs():
             rel_file_path = os.path.relpath(file_path, SCRIPT_DIR).replace('\\', '/')
             ext = os.path.splitext(fname)[1].lower()
 
-            if ext not in ['.pptx', '.ppt', '.pdf', '.xlsx', '.xls', '.docx', '.png', '.jpg', '.jpeg', '.mp4']:
+            if ext not in ['.pptx', '.ppt', '.pdf', '.xlsx', '.xls', '.docx', '.png', '.jpg', '.jpeg', '.mp4', '.webm', '.mov', '.m4v']:
                 continue
 
             file_size = os.path.getsize(file_path)
@@ -303,6 +366,12 @@ def scan_docs():
                     "name": fname,
                     "size": size_str
                 }
+            elif ext in ['.mp4', '.webm', '.mov', '.m4v']:
+                groups[group_key]["files"]["video"] = {
+                    "url": rel_file_path,
+                    "name": fname,
+                    "size": size_str
+                }
 
     # 최종 결과 빌드
     for gid, ginfo in groups.items():
@@ -340,6 +409,10 @@ def scan_docs():
             encoded_pdf = urllib.parse.quote(ginfo["files"]["pdf"]["url"])
             encoded_title = urllib.parse.quote(title)
             item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}"
+        elif "video" in ginfo["files"]:
+            encoded_video = urllib.parse.quote(ginfo["files"]["video"]["url"])
+            encoded_title = urllib.parse.quote(title)
+            item["web_deck_url"] = f"viewer.html?file={encoded_video}&title={encoded_title}&type=video"
 
         if "author" in preset:
             item["author"] = preset["author"]
