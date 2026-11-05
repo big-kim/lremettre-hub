@@ -1,7 +1,8 @@
 /**
- * 르메뜨레 디지털 아카이브 허브 (L.REMETTRE Hub Main Controller)
- * 콘셉트 1: 시네마틱 라이브 스테이지 (Apple Keynote & Vercel Style)
- * 딥 블랙 + 딥 오렌지 + 골드 럭셔리 하이엔드 테마
+ * 르메뜨레 공식 디지털 아카이브 허브 (L.REMETTRE White Editorial & Pastel Stage Controller v2.0)
+ * - 6대 공식 카테고리 대시보드 요약 카드 자동 집계 및 연동
+ * - 모든 PPT/PDF 첫 슬라이드 표지 썸네일 & 모든 영상 첫 클립 라이브 미리보기 렌더링
+ * - PC / 태블릿 / 모바일 100% 반응형 인터랙션
  */
 
 (function () {
@@ -12,8 +13,9 @@
   let searchQuery = '';
 
   const gridContainer = document.getElementById('resources-grid');
+  const summaryGrid = document.getElementById('summary-cards-grid');
   const searchInput = document.getElementById('search-input');
-  const filterButtons = document.querySelectorAll('.filter-btn');
+  const headerTotalCount = document.getElementById('header-total-count');
 
   // 히어로 라이브 스테이지 요소
   const stageCanvas = document.getElementById('stage-canvas');
@@ -23,447 +25,265 @@
   const stageTotalIdx = document.getElementById('stage-total-idx');
   const stageProgressFill = document.getElementById('stage-progress-fill');
   const tabDeckCellScience = document.getElementById('tab-deck-cell-science');
+  const tabDeckSpEdition = document.getElementById('tab-deck-sp-edition');
   const tabDeckLeadership = document.getElementById('tab-deck-leadership');
-  const tabDeckReboom = document.getElementById('tab-deck-reboom');
   const btnTopLaunch = document.getElementById('btn-top-launch');
   const heroMainCta = document.getElementById('hero-main-cta');
 
-  let currentDeck = 'cell-science'; // 'cell-science' | 'leadership' | 'reboom'
-  let currentSlideIdx = 0;
-  let currentCellSlideIdx = 0;
-
-  // 1. 메인 라이브 피치덱: 르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학 (27p)
-  const CELL_SCIENCE_PDF_URL = 'docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/L.ReMeTTRe_NEW_PPT.pdf';
-  const CELL_SCIENCE_VIEWER_URL = `viewer.html?file=${encodeURIComponent(CELL_SCIENCE_PDF_URL)}&title=${encodeURIComponent('르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학')}`;
-
-  const CELL_SCIENCE_SLIDES = [
+  // 6대 공식 카테고리 정의 (레퍼런스 파스텔 6종 매핑)
+  const CATEGORY_DEFINITIONS = [
     {
-      type: 'cover',
-      tag: 'L.REMETTRE OFFICIAL MAIN DECK (27P)',
-      title: '르메뜨레(L.ReMeTTRe) :\n세포의 시간을 되돌리는 과학',
-      subtitle: 'REMETTRE (Restore) · 가장 활력 넘치던 본연의 상태로 당신의 삶을 되돌립니다',
-      quote: '시간을 멈출 수는 없지만, 세포의 활력은 되돌릴 수 있습니다. 세포 수준의 재생과 생체 에너지 회복을 실현합니다.'
+      key: 'presentation',
+      name: '프레젠테이션&강의',
+      eyebrow: 'PRESENTATION',
+      tone: 'tone-pink',
+      icon: '📊',
+      defaultThumb: 'assets/thumbs/presentation-LReMeTTReNEWPPT.jpg'
     },
     {
-      type: 'content',
-      tag: 'CELLULAR SCIENCE ARCHITECTURE',
-      index: 2,
-      title: '세포 재생의 3대 핵심 메커니즘',
-      subtitle: '피부 표면이 아닌 세포의 근원적 활력과 생체 에너지를 깨우는 과학적 접근',
-      card_left: {
-        badge: 'MECHANISM 01',
-        badge_color: 'danger',
-        quote: '미토콘드리아 ATP 활력 에너지 복원',
-        body: '세포 호흡과 대사 기능을 극대화하여 지친 세포의 자생적 재생 사이클을 빠르게 정상화합니다.',
-        result: '생체 에너지 활성화'
-      },
-      card_right: {
-        badge: 'MECHANISM 02',
-        badge_color: 'success',
-        quote: '강력한 항산화 네트워크 & 자가치유',
-        body: '활성산소와 외부 산화 스트레스를 억제하고 세포막 지질층을 탄탄하게 복구합니다.',
-        result: '세포 방어벽 강화'
-      },
-      quote: '독보적 유효 성분 전달 기술로 유효 물질이 세포 깊숙이 안정적으로 침투합니다.'
+      key: 'document',
+      name: '문서 자료',
+      eyebrow: 'DOCUMENTS',
+      tone: 'tone-sky',
+      icon: '📑',
+      defaultThumb: ''
     },
     {
-      type: 'content',
-      tag: 'PREMIUM WELLNESS VISION',
-      index: 3,
-      title: '글로벌 웰니스 라이프 패러다임',
-      subtitle: '과학적 임상 데이터와 프리미엄 성분으로 완성되는 르메뜨레의 가치 성장',
-      card_left: {
-        badge: 'POINT 01',
-        badge_color: 'danger',
-        quote: '독점 원료 배합 특허 & 임상 검증',
-        body: '식물성 뮤신 오크라 및 프리미엄 복합 포뮬러를 통한 안전하고 확실한 세포 재생 효과를 입증합니다.',
-        result: '공식 임상 완료'
-      },
-      card_right: {
-        badge: 'POINT 02',
-        badge_color: 'success',
-        quote: '글로벌 비즈니스 & 비전 로드맵',
-        body: '파트너와 함께 지속 가능한 가치를 창출하고 시대를 앞서가는 웰니스 문화를 선도합니다.',
-        result: '동반 성장 시스템'
-      },
-      quote: '총 27장의 공식 고화질 슬라이드를 F11 전체화면으로 지금 바로 발표하세요.'
+      key: 'event_video',
+      name: '행사 영상',
+      eyebrow: 'EVENT MEDIA',
+      tone: 'tone-peach',
+      icon: '🎥',
+      defaultThumb: ''
+    },
+    {
+      key: 'review_video',
+      name: '후기 영상',
+      eyebrow: 'REVIEW CLIP',
+      tone: 'tone-yellow',
+      icon: '🎬',
+      defaultThumb: 'assets/thumbs/review_video-02르메뜨레회원인바디건강다큐HUD비실명판.jpg'
+    },
+    {
+      key: 'analysis',
+      name: '분석 자료',
+      eyebrow: 'BIO ANALYSIS',
+      tone: 'tone-rose',
+      icon: '📈',
+      defaultThumb: ''
+    },
+    {
+      key: 'forms',
+      name: '각종 양식',
+      eyebrow: 'OFFICIAL FORMS',
+      tone: 'tone-lavender',
+      icon: '📋',
+      defaultThumb: ''
     }
   ];
 
-  const leadershipSlides = window.LEADERSHIP_SLIDES || [];
+  // 히어로 스테이지 대표 프리뷰 슬라이드 목록
+  const HERO_STAGE_DECKS = [
+    {
+      key: 'cell-science',
+      tag: 'OFFICIAL MAIN DECK · 27P',
+      title: '르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학',
+      pages: 27,
+      thumb: 'assets/thumbs/presentation-LReMeTTReNEWPPT.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/L.ReMeTTRe_NEW_PPT.pdf') + '&title=' + encodeURIComponent('르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학')
+    },
+    {
+      key: 'sp-edition',
+      tag: 'SP SPECIAL EDITION · 30P',
+      title: '르메뜨레 공식 프레젠테이션 (v2.1 SP 에디션)',
+      pages: 30,
+      thumb: 'assets/thumbs/presentation-르메뜨레프레젠테이션v21SP에디션.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/르메뜨레 프레젠테이션_v2.1_SP에디션.pdf') + '&title=' + encodeURIComponent('르메뜨레 공식 프레젠테이션 (v2.1 SP 에디션)')
+    },
+    {
+      key: 'leadership',
+      tag: 'LEADERSHIP MASTERCLASS · 16P',
+      title: '변화하는 시대, 리더십의 진짜 온도',
+      pages: 16,
+      thumb: 'assets/thumbs/leadership-masterclass.jpg',
+      viewerUrl: 'presentation.html'
+    },
+    {
+      key: 'v30-seminar',
+      tag: 'OFFICIAL SEMINAR V3.0 · 49P',
+      title: '르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)',
+      pages: 49,
+      thumb: 'assets/thumbs/presentation-르메뜨레세미나OfficialV30.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/르메뜨레 세미나_Official_V3.0.pdf') + '&title=' + encodeURIComponent('르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)')
+    },
+    {
+      key: 'v14-business',
+      tag: 'BUSINESS PITCH DECK V1.4 · 50P',
+      title: '르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)',
+      pages: 50,
+      thumb: 'assets/thumbs/presentation-lremettre사업설명자료세미나용V14.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/lremettre사업설명자료_세미나용_V1.4.pdf') + '&title=' + encodeURIComponent('르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)')
+    }
+  ];
 
-  const REBOOM_PDF_URL = 'docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/250720_%EB%A5%B4%EB%A9%94%EB%94%A8%EB%A5%B4_REBOOM_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98.pdf';
-  const REBOOM_VIEWER_URL = `viewer.html?file=${encodeURIComponent(REBOOM_PDF_URL)}&title=${encodeURIComponent('르메뜨레 REBOOM 프로젝트 프레젠테이션')}`;
+  let currentHeroIdx = 0;
 
   /**
    * ==========================================================================
-   * 1. 히어로 라이브 스테이지 (THE CINEMATIC LIVE STAGE)
+   * 1. 히어로 라이브 스테이지 (첫 슬라이드 실제 표지 프리뷰 쇼케이스)
    * ==========================================================================
    */
-
-  function renderCellScienceSlide(index) {
-    if (!stageCanvas || !CELL_SCIENCE_SLIDES.length) return;
-
-    const slide = CELL_SCIENCE_SLIDES[index];
-    if (!slide) return;
-
-    if (slide.type === 'cover') {
-      stageCanvas.innerHTML = `
-        <div class="stage-slide-view active slide-cover-layout">
-          <img src="assets/logo/lremettre_emblem.png" alt="L.REMETTRE" class="cover-brand-symbol">
-          <div class="cover-super-pill">
-            <span>✨</span> ${slide.tag || 'L.REMETTRE OFFICIAL MAIN DECK'}
-          </div>
-          <h3 class="cover-title">
-            ${(slide.title || '').replace(/\n/g, '<br>')}
-          </h3>
-          <p class="cover-subtitle">
-            ${slide.subtitle || ''}
-          </p>
-          ${slide.quote ? `
-            <div class="cover-quote-box">
-              <span>“</span> ${slide.quote} <span>”</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    } else {
-      const cardLeft = slide.card_left || {};
-      const cardRight = slide.card_right || {};
-
-      stageCanvas.innerHTML = `
-        <div class="stage-slide-view active">
-          <div>
-            <div class="slide-top-meta">
-              <span class="slide-tag-pill">${slide.tag || 'CELLULAR SCIENCE'}</span>
-              <span style="font-size: 11.5px; font-weight: 700; color: var(--gold-bright); letter-spacing: 1px;">
-                KEY INSIGHT ${slide.index} OF ${CELL_SCIENCE_SLIDES.length}
-              </span>
-            </div>
-            <h3 class="slide-headline">${(slide.title || '').replace(/\n/g, ' ')}</h3>
-            <p class="slide-lead-copy">${slide.subtitle || ''}</p>
-          </div>
-
-          <div class="slide-cards-split">
-            <div class="slide-mini-card ${cardLeft.badge_color || 'danger'}">
-              <div>
-                <div class="card-badge-mini text-${cardLeft.badge_color || 'danger'}">
-                  ${cardLeft.badge || 'POINT A'}
-                </div>
-                <div class="card-quote-mini">${cardLeft.quote || ''}</div>
-                <div class="card-body-mini">${cardLeft.body || ''}</div>
-              </div>
-              ${cardLeft.result ? `
-                <div class="card-result-pill-mini">
-                  ${cardLeft.result}
-                </div>
-              ` : ''}
-            </div>
-
-            <div class="slide-mini-card ${cardRight.badge_color || 'success'}">
-              <div>
-                <div class="card-badge-mini text-${cardRight.badge_color || 'success'}">
-                  ${cardRight.badge || 'POINT B'}
-                </div>
-                <div class="card-quote-mini">${cardRight.quote || ''}</div>
-                <div class="card-body-mini">${cardRight.body || ''}</div>
-              </div>
-              ${cardRight.result ? `
-                <div class="card-result-pill-mini">
-                  ${cardRight.result}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-
-          ${slide.quote ? `
-            <div class="slide-ethos-footer">
-              <strong>OFFICIAL DECK HIGHLIGHT</strong>
-              <span>“${slide.quote}”</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }
-
-    // UI 인디케이터 업데이트 (27장 피치덱 기준)
-    if (stageCurrentIdx) stageCurrentIdx.textContent = String(index + 1).padStart(2, '0');
-    if (stageTotalIdx) stageTotalIdx.textContent = '27';
-    if (stageProgressFill) {
-      const pct = ((index + 1) / 27) * 100;
-      stageProgressFill.style.width = `${pct}%`;
-    }
-  }
-
-  function renderLeadershipSlide(index) {
-    if (!stageCanvas || !leadershipSlides.length) return;
-
-    const slide = leadershipSlides[index];
-    if (!slide) return;
-
-    if (slide.type === 'cover') {
-      stageCanvas.innerHTML = `
-        <div class="stage-slide-view active slide-cover-layout">
-          <img src="assets/logo/lremettre_emblem.png" alt="L.REMETTRE" class="cover-brand-symbol">
-          <div class="cover-super-pill">
-            <span>✨</span> ${slide.tag || 'L.REMETTRE LEADERSHIP MASTERCLASS'}
-          </div>
-          <h3 class="cover-title">
-            ${(slide.title || '').replace(/\n/g, '<br>')}
-          </h3>
-          <p class="cover-subtitle">
-            ${slide.subtitle || ''}
-          </p>
-          ${slide.quote ? `
-            <div class="cover-quote-box">
-              <span>“</span> ${slide.quote} <span>”</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    } else {
-      // Split / Content layout
-      const cardLeft = slide.card_left || {};
-      const cardRight = slide.card_right || {};
-
-      stageCanvas.innerHTML = `
-        <div class="stage-slide-view active">
-          <div>
-            <div class="slide-top-meta">
-              <span class="slide-tag-pill">${slide.tag || 'LEADERSHIP INSIGHT'}</span>
-              <span style="font-size: 11.5px; font-weight: 700; color: var(--gold-bright); letter-spacing: 1px;">
-                PART ${slide.index} OF ${leadershipSlides.length}
-              </span>
-            </div>
-            <h3 class="slide-headline">${(slide.title || '').replace(/\n/g, ' ')}</h3>
-            <p class="slide-lead-copy">${slide.subtitle || ''}</p>
-          </div>
-
-          <div class="slide-cards-split">
-            <div class="slide-mini-card ${cardLeft.badge_color || 'danger'}">
-              <div>
-                <div class="card-badge-mini text-${cardLeft.badge_color || 'danger'}">
-                  ${cardLeft.badge || 'POINT A'}
-                </div>
-                <div class="card-quote-mini">${cardLeft.quote || ''}</div>
-                <div class="card-body-mini">${cardLeft.body || ''}</div>
-              </div>
-              ${cardLeft.result ? `
-                <div class="card-result-pill-mini">
-                  ${cardLeft.result}
-                </div>
-              ` : ''}
-            </div>
-
-            <div class="slide-mini-card ${cardRight.badge_color || 'success'}">
-              <div>
-                <div class="card-badge-mini text-${cardRight.badge_color || 'success'}">
-                  ${cardRight.badge || 'POINT B'}
-                </div>
-                <div class="card-quote-mini">${cardRight.quote || ''}</div>
-                <div class="card-body-mini">${cardRight.body || ''}</div>
-              </div>
-              ${cardRight.result ? `
-                <div class="card-result-pill-mini pill-gold">
-                  ${cardRight.result}
-                </div>
-              ` : ''}
-            </div>
-          </div>
-
-          ${slide.quote ? `
-            <div class="slide-ethos-footer">
-              <strong>CORE ETHOS</strong>
-              <span>“${slide.quote}”</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }
-
-    // UI 인디케이터 업데이트
-    if (stageCurrentIdx) stageCurrentIdx.textContent = String(index + 1).padStart(2, '0');
-    if (stageTotalIdx) stageTotalIdx.textContent = String(leadershipSlides.length).padStart(2, '0');
-    if (stageProgressFill) {
-      const pct = ((index + 1) / leadershipSlides.length) * 100;
-      stageProgressFill.style.width = `${pct}%`;
-    }
-  }
-
-  function renderReboomSlide() {
+  function renderHeroStage(idx) {
     if (!stageCanvas) return;
+    currentHeroIdx = (idx + HERO_STAGE_DECKS.length) % HERO_STAGE_DECKS.length;
+    const deck = HERO_STAGE_DECKS[currentHeroIdx];
+
+    if (tabDeckCellScience) tabDeckCellScience.classList.toggle('active', deck.key === 'cell-science');
+    if (tabDeckSpEdition) tabDeckSpEdition.classList.toggle('active', deck.key === 'sp-edition');
+    if (tabDeckLeadership) tabDeckLeadership.classList.toggle('active', deck.key === 'leadership');
+
+    if (btnTopLaunch) btnTopLaunch.href = deck.viewerUrl;
+    if (heroMainCta) heroMainCta.href = deck.viewerUrl;
 
     stageCanvas.innerHTML = `
-      <div class="stage-slide-view active stage-reboom-view">
-        <div class="reboom-grid">
-          <div class="reboom-preview-card">
-            <span class="reboom-meta-badge">OFFICIAL PRESENTATION DECK</span>
-            <h3 class="reboom-card-title">르메뜨레 REBOOM 프로젝트</h3>
-            <p class="reboom-card-desc">
-              새로운 시대, 웰니스 비즈니스의 완벽한 재도약과 차세대 성장 엔진을 담은 공식 프레젠테이션 피치덱입니다. 총 19장의 고화질 슬라이드를 브라우저에서 바로 시네마틱 와이드로 발표할 수 있습니다.
-            </p>
-            <ul class="reboom-features-list">
-              <li><span>✓</span> 비전 & 비즈니스 철학 패러다임</li>
-              <li><span>✓</span> 차세대 보상 구조 및 파트너십 로드맵</li>
-              <li><span>✓</span> 프리미엄 프로덕트 라인업 및 임상 성과</li>
-            </ul>
+      <a href="${deck.viewerUrl}" target="_blank" style="display:block; width:100%; height:100%; position:relative;" title="클릭하여 전체화면 발표 시작">
+        <img src="${deck.thumb}" alt="${deck.title} 첫 슬라이드" class="stage-slide-img-preview">
+        <div class="stage-slide-overlay-bar">
+          <div class="overlay-info">
+            <span class="overlay-tag">${deck.tag}</span>
+            <span class="overlay-title">${deck.title}</span>
           </div>
-
-          <div class="reboom-action-box">
-            <h4>💡 실시간 프레젠테이션</h4>
-            <p>PDF 설치 없이 F11 전체화면으로 즉시 발표</p>
-            <a href="${REBOOM_VIEWER_URL}" target="_blank" class="btn-primary-glow" style="padding: 12px 28px; font-size: 14.5px;">
-              <span>🚀</span> REBOOM 발표 시작
-            </a>
-            <a href="${REBOOM_PDF_URL}" download class="btn-download-pill" style="margin-top: 4px;">
-              <span>💾</span> 원본 PDF 다운로드 (13.7 MB)
-            </a>
-          </div>
+          <span class="overlay-open-btn">▶ 발표 시작</span>
         </div>
-
-        <div class="slide-ethos-footer">
-          <strong>PROJECT BRIEF</strong>
-          <span>“도약하는 르메뜨레의 비전과 비즈니스 로드맵을 완벽하게 전달하는 공식 무대”</span>
-        </div>
-      </div>
+      </a>
     `;
 
-    if (stageCurrentIdx) stageCurrentIdx.textContent = '01';
-    if (stageTotalIdx) stageTotalIdx.textContent = '19';
-    if (stageProgressFill) stageProgressFill.style.width = '100%';
-  }
-
-  function updateDeckState(deck) {
-    currentDeck = deck;
-
-    // 탭 스타일 활성화 토글
-    if (tabDeckCellScience) tabDeckCellScience.classList.toggle('active', deck === 'cell-science');
-    if (tabDeckLeadership) tabDeckLeadership.classList.toggle('active', deck === 'leadership');
-    if (tabDeckReboom) tabDeckReboom.classList.toggle('active', deck === 'reboom');
-
-    if (deck === 'cell-science') {
-      if (btnTopLaunch) {
-        btnTopLaunch.href = CELL_SCIENCE_VIEWER_URL;
-        btnTopLaunch.innerHTML = '<span>⛶</span> 전체화면 ↗';
-      }
-      if (heroMainCta) {
-        heroMainCta.href = CELL_SCIENCE_VIEWER_URL;
-        heroMainCta.innerHTML = '<span>🚀</span> 프레젠테이션 시작';
-      }
-      if (stagePrevBtn) stagePrevBtn.style.visibility = 'visible';
-      if (stageNextBtn) stageNextBtn.style.visibility = 'visible';
-      renderCellScienceSlide(currentCellSlideIdx);
-    } else if (deck === 'leadership') {
-      if (btnTopLaunch) {
-        btnTopLaunch.href = 'presentation.html';
-        btnTopLaunch.innerHTML = '<span>⛶</span> 전체화면 발표 ↗';
-      }
-      if (heroMainCta) {
-        heroMainCta.href = 'presentation.html';
-        heroMainCta.innerHTML = '<span>🚀</span> 프레젠테이션 시작';
-      }
-      if (stagePrevBtn) stagePrevBtn.style.visibility = 'visible';
-      if (stageNextBtn) stageNextBtn.style.visibility = 'visible';
-      renderLeadershipSlide(currentSlideIdx);
-    } else {
-      if (btnTopLaunch) {
-        btnTopLaunch.href = REBOOM_VIEWER_URL;
-        btnTopLaunch.innerHTML = '<span>⛶</span> REBOOM 발표 ↗';
-      }
-      if (heroMainCta) {
-        heroMainCta.href = REBOOM_VIEWER_URL;
-        heroMainCta.innerHTML = '<span>🚀</span> REBOOM 발표 시작';
-      }
-      if (stagePrevBtn) stagePrevBtn.style.visibility = 'hidden';
-      if (stageNextBtn) stageNextBtn.style.visibility = 'hidden';
-      renderReboomSlide();
+    if (stageCurrentIdx) stageCurrentIdx.textContent = String(currentHeroIdx + 1).padStart(2, '0');
+    if (stageTotalIdx) stageTotalIdx.textContent = String(HERO_STAGE_DECKS.length).padStart(2, '0');
+    if (stageProgressFill) {
+      const pct = ((currentHeroIdx + 1) / HERO_STAGE_DECKS.length) * 100;
+      stageProgressFill.style.width = `${pct}%`;
     }
   }
 
   function initHeroLiveStage() {
     if (!stageCanvas) return;
 
-    // 탭 이벤트
     if (tabDeckCellScience) {
-      tabDeckCellScience.addEventListener('click', () => updateDeckState('cell-science'));
+      tabDeckCellScience.addEventListener('click', () => renderHeroStage(0));
+    }
+    if (tabDeckSpEdition) {
+      tabDeckSpEdition.addEventListener('click', () => renderHeroStage(1));
     }
     if (tabDeckLeadership) {
-      tabDeckLeadership.addEventListener('click', () => updateDeckState('leadership'));
-    }
-    if (tabDeckReboom) {
-      tabDeckReboom.addEventListener('click', () => updateDeckState('reboom'));
+      tabDeckLeadership.addEventListener('click', () => renderHeroStage(2));
     }
 
-    // 슬라이드 이전/다음
     if (stagePrevBtn) {
-      stagePrevBtn.addEventListener('click', () => {
-        if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
-          currentCellSlideIdx = (currentCellSlideIdx - 1 + CELL_SCIENCE_SLIDES.length) % CELL_SCIENCE_SLIDES.length;
-          renderCellScienceSlide(currentCellSlideIdx);
-        } else if (currentDeck === 'leadership' && leadershipSlides.length) {
-          currentSlideIdx = (currentSlideIdx - 1 + leadershipSlides.length) % leadershipSlides.length;
-          renderLeadershipSlide(currentSlideIdx);
-        }
-      });
+      stagePrevBtn.addEventListener('click', () => renderHeroStage(currentHeroIdx - 1));
     }
-
     if (stageNextBtn) {
-      stageNextBtn.addEventListener('click', () => {
-        if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
-          currentCellSlideIdx = (currentCellSlideIdx + 1) % CELL_SCIENCE_SLIDES.length;
-          renderCellScienceSlide(currentCellSlideIdx);
-        } else if (currentDeck === 'leadership' && leadershipSlides.length) {
-          currentSlideIdx = (currentSlideIdx + 1) % leadershipSlides.length;
-          renderLeadershipSlide(currentSlideIdx);
-        }
-      });
+      stageNextBtn.addEventListener('click', () => renderHeroStage(currentHeroIdx + 1));
     }
 
-    // 키보드 이벤트 (방향키로 슬라이드 넘기기)
     window.addEventListener('keydown', (e) => {
-      // 텍스트 인풋 포커스 중에는 제외
       if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-
-      if (currentDeck === 'cell-science' && CELL_SCIENCE_SLIDES.length) {
-        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-          currentCellSlideIdx = (currentCellSlideIdx + 1) % CELL_SCIENCE_SLIDES.length;
-          renderCellScienceSlide(currentCellSlideIdx);
-        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-          currentCellSlideIdx = (currentCellSlideIdx - 1 + CELL_SCIENCE_SLIDES.length) % CELL_SCIENCE_SLIDES.length;
-          renderCellScienceSlide(currentCellSlideIdx);
-        }
-      } else if (currentDeck === 'leadership' && leadershipSlides.length) {
-        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-          currentSlideIdx = (currentSlideIdx + 1) % leadershipSlides.length;
-          renderLeadershipSlide(currentSlideIdx);
-        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-          currentSlideIdx = (currentSlideIdx - 1 + leadershipSlides.length) % leadershipSlides.length;
-          renderLeadershipSlide(currentSlideIdx);
-        }
-      }
+      if (e.key === 'ArrowRight') renderHeroStage(currentHeroIdx + 1);
+      else if (e.key === 'ArrowLeft') renderHeroStage(currentHeroIdx - 1);
     });
 
-    // 초기 렌더링 (세포 과학 피치덱 메인 라이브 기본 활성화)
-    updateDeckState('cell-science');
+    renderHeroStage(0);
   }
 
   /**
    * ==========================================================================
-   * 2. 자료실 카탈로그 (RESOURCE ARCHIVE CATALOG)
+   * 2. 대시보드 6대 카테고리 파스텔 요약 카드 렌더링
    * ==========================================================================
    */
+  function renderSummaryDashboard() {
+    if (!summaryGrid) return;
 
-  async function loadResources() {
-    try {
-      const response = await fetch(`data/resources.json?t=${Date.now()}`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      resourcesData = await response.json();
-      renderResources();
-    } catch (err) {
-      console.warn('Failed to fetch JSON, falling back:', err);
+    if (headerTotalCount) {
+      headerTotalCount.textContent = String(resourcesData.length);
+    }
+
+    summaryGrid.innerHTML = CATEGORY_DEFINITIONS.map((cat) => {
+      const catItems = resourcesData.filter((r) => r.category === cat.key);
+      const count = catItems.length;
+      const firstThumb = (catItems.find((r) => r.thumbnail) || {}).thumbnail || cat.defaultThumb;
+      const isActive = currentCategory === cat.key;
+
+      return `
+        <button type="button" class="summary-pastel-card ${cat.tone} ${isActive ? 'active-summary' : ''}" data-summary-cat="${cat.key}" title="${cat.name} 카테고리 보기 (${count}건)">
+          <div class="summary-card-top">
+            <div class="summary-thumb-mini">
+              ${firstThumb
+                ? `<img src="${firstThumb}" alt="${cat.name} 대표 미리보기" loading="lazy">`
+                : `<span class="summary-fallback-icon">${cat.icon}</span>`
+              }
+            </div>
+            <span class="summary-count-badge">${count}개 자료</span>
+          </div>
+          <div class="summary-card-body">
+            <span class="summary-eyebrow">${cat.eyebrow}</span>
+            <h3 class="summary-title">${cat.name}</h3>
+            <span class="summary-action-link">바로보기 <span>→</span></span>
+          </div>
+        </button>
+      `;
+    }).join('');
+
+    summaryGrid.querySelectorAll('.summary-pastel-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const targetCat = card.getAttribute('data-summary-cat');
+        if (currentCategory === targetCat) {
+          setCategory('all', true);
+        } else {
+          setCategory(targetCat, true);
+        }
+      });
+    });
+  }
+
+  /**
+   * ==========================================================================
+   * 3. 카테고리 전환 통합 제어
+   * ==========================================================================
+   */
+  function setCategory(catKey, scrollToCatalog) {
+    currentCategory = catKey;
+
+    // 알약형 필터 버튼 동기화
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.category === catKey);
+    });
+
+    // 서브 네비게이션 버튼 동기화
+    document.querySelectorAll('.sub-cat-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.category === catKey);
+    });
+
+    // 상단 메인 네비게이션 동기화
+    document.querySelectorAll('.main-nav-link').forEach((link) => {
+      link.classList.toggle('active', link.dataset.navCat === catKey);
+    });
+
+    renderSummaryDashboard();
+    renderResources();
+
+    if (scrollToCatalog) {
+      const catalogEl = document.getElementById('resources-catalog');
+      if (catalogEl) {
+        catalogEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }
 
+  /**
+   * ==========================================================================
+   * 4. 자료실 카드 그리드 (첫 슬라이드 표지 & 첫 클립 비디오 라이브 프리뷰)
+   * ==========================================================================
+   */
   function getDownloadBtnHtml(type, fileInfo) {
     let icon = '💾';
     let label = type.toUpperCase();
@@ -485,14 +305,55 @@
       label = 'Image';
     } else if (type === 'video' || type === 'mp4' || type === 'webm' || type === 'mov') {
       icon = '🎬';
-      label = 'MP4 영상';
+      label = 'MP4 다운로드';
     }
 
     return `
-      <a href="${fileInfo.url}" class="btn-download-pill" download="${fileInfo.name}" target="_blank" title="${fileInfo.name} 다운로드">
+      <a href="${fileInfo.url}" class="btn-download-pill" download="${fileInfo.name}" target="_blank" title="${fileInfo.name} 보안 다운로드">
         <span>${icon}</span> <span>${label}</span> <span class="file-size">${fileInfo.size}</span>
       </a>
     `;
+  }
+
+  function bindVideoHoverPreviews() {
+    if (!gridContainer) return;
+    const videoCards = gridContainer.querySelectorAll('.resource-card[data-has-video="true"]');
+    videoCards.forEach((card) => {
+      const vid = card.querySelector('video.card-thumb-video');
+      const chipText = card.querySelector('.js-video-chip-text');
+      if (!vid) return;
+
+      // 첫 클립 구간(0.8초 ~ 6.5초) 반복 미리보기
+      vid.addEventListener('timeupdate', () => {
+        if (vid.currentTime > 6.5) {
+          vid.currentTime = 0.8;
+        }
+      });
+
+      const startPreview = () => {
+        if (vid.paused) {
+          if (vid.currentTime < 0.5 || vid.currentTime > 6.5) {
+            try { vid.currentTime = 0.8; } catch (e) {}
+          }
+          vid.play().then(() => {
+            vid.classList.add('playing-preview');
+            if (chipText) chipText.textContent = '첫 클립 재생 중...';
+          }).catch(() => {});
+        }
+      };
+
+      const stopPreview = () => {
+        if (!vid.paused) {
+          vid.pause();
+          vid.classList.remove('playing-preview');
+          if (chipText) chipText.textContent = '첫 클립 미리보기';
+        }
+      };
+
+      card.addEventListener('mouseenter', startPreview);
+      card.addEventListener('mouseleave', stopPreview);
+      card.addEventListener('touchstart', startPreview, { passive: true });
+    });
   }
 
   function renderResources() {
@@ -506,17 +367,20 @@
         item.title.toLowerCase().includes(q) ||
         (item.subtitle && item.subtitle.toLowerCase().includes(q)) ||
         (item.description && item.description.toLowerCase().includes(q)) ||
+        (item.category_name && item.category_name.toLowerCase().includes(q)) ||
         (item.tags && item.tags.some((t) => t.toLowerCase().includes(q)));
 
       return matchCategory && matchSearch;
     });
 
     if (filtered.length === 0) {
+      const catObj = CATEGORY_DEFINITIONS.find((c) => c.key === currentCategory);
+      const catLabel = catObj ? catObj.name : '선택한 카테고리';
       gridContainer.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 70px 20px; background: rgba(14, 18, 28, 0.7); border-radius: 20px; border: 1.5px dashed rgba(255, 255, 255, 0.1);">
-          <p style="font-size: 32px; margin-bottom: 10px;">🔍</p>
-          <h3 style="font-size: 19px; color: #FFFFFF; margin-bottom: 6px;">일치하는 공식 자료가 없습니다</h3>
-          <p style="font-size: 14px; color: #94A3B8;">다른 검색어를 입력하시거나 카테고리 필터를 변경해 보세요.</p>
+        <div class="empty-catalog-box">
+          <div class="empty-icon">📂</div>
+          <h3>현재 '${catLabel}'에 등록된 자료가 없습니다</h3>
+          <p>docs 폴더의 해당 카테고리 폴더에 파일을 넣으시면 첫 화면 미리보기와 함께 즉시 등록됩니다.</p>
         </div>
       `;
       return;
@@ -524,17 +388,12 @@
 
     gridContainer.innerHTML = filtered
       .map((item) => {
-        let downloadBtnsHtml = '';
-        if (item.downloads) {
-          const btns = Object.entries(item.downloads).map(([type, fileInfo]) => {
-            return getDownloadBtnHtml(type, fileInfo);
-          });
-          downloadBtnsHtml = `<div class="card-download-group">${btns.join('')}</div>`;
-        }
+        const isVideoItem =
+          item.category === 'event_video' ||
+          item.category === 'review_video' ||
+          (item.downloads && Boolean(item.downloads.video) && !item.downloads.pdf && !item.downloads.pptx);
 
         let webDeckUrl = item.web_deck_url;
-        const isVideoItem = item.category === 'video' || (item.downloads && Boolean(item.downloads.video) && !item.downloads.pdf && !item.downloads.pptx);
-
         if (!webDeckUrl && item.downloads) {
           if (item.downloads.pdf) {
             webDeckUrl = `viewer.html?file=${encodeURIComponent(item.downloads.pdf.url)}&title=${encodeURIComponent(item.title)}`;
@@ -546,49 +405,86 @@
           }
         }
 
-        const launchLabel = isVideoItem ? '영상 바로 재생' : '프레젠테이션 시작';
+        let downloadBtnsHtml = '';
+        if (item.downloads) {
+          const btns = Object.entries(item.downloads).map(([type, fileInfo]) => {
+            return getDownloadBtnHtml(type, fileInfo);
+          });
+          downloadBtnsHtml = `<div class="card-download-group">${btns.join('')}</div>`;
+        }
+
+        const launchLabel = isVideoItem ? '전체 영상 재생' : '프레젠테이션 시작';
         const launchIcon = isVideoItem ? '🎬' : '🚀';
 
-        const launchBtn = webDeckUrl
-          ? `<a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="인터넷 브라우저에서 바로 열기">
-              <span>${launchIcon}</span> ${launchLabel}
-            </a>`
-          : (item.downloads && (item.downloads.pptx || item.downloads.pdf || item.downloads.video)
-              ? `<a href="${(item.downloads.pptx || item.downloads.pdf || item.downloads.video).url}" class="btn-deck-launch" target="_blank" title="열기">
-                  <span>${launchIcon}</span> ${launchLabel}
-                </a>`
-              : '');
+        // 좌상단 핑크 알약 뱃지 (슬라이드 장수 또는 영상 길이)
+        const leftPillText = item.slide_count
+          ? `${item.slide_count}P 슬라이드`
+          : (item.duration ? `🎬 ${item.duration}` : (item.badge || item.version));
 
-        // 16:9 썸네일 그래픽 설정
-        const badgeText = item.badge || item.category_name;
-        const pageCountBadge = item.slide_count ? `${item.slide_count}P` : (isVideoItem ? 'HD VIDEO' : (item.version || 'v1.0'));
-        const thumbCenterIcon = isVideoItem ? '🎬' : (item.category === 'presentation' ? '📽️' : '📑');
-        const thumbDeckType = isVideoItem ? 'FULL HD MEDIA' : '16:9 WIDESCREEN';
+        // 16:9 실제 미리보기 미디어 (PPT 첫 슬라이드 이미지 vs 영상 첫 클립 대표 화면 + 호버 비디오)
+        let previewMediaHtml = '';
+        if (isVideoItem && item.downloads && item.downloads.video) {
+          previewMediaHtml = `
+            ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title} 첫 클립 미리보기" class="card-thumb-img" loading="lazy">` : ''}
+            <video
+              class="card-thumb-video"
+              src="${item.downloads.video.url}"
+              muted
+              loop
+              playsinline
+              preload="none"
+            ></video>
+          `;
+        } else if (item.thumbnail) {
+          previewMediaHtml = `
+            <img
+              src="${item.thumbnail}"
+              alt="${item.title} 첫 슬라이드 미리보기"
+              class="card-thumb-img"
+              loading="lazy"
+            >
+          `;
+        } else {
+          previewMediaHtml = `
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F1F5F9; color:#64748B; font-weight:800;">
+              <span>📑 ${item.category_name}</span>
+            </div>
+          `;
+        }
+
+        const previewChipHtml = isVideoItem
+          ? `<div class="card-preview-chip video-chip">
+               <span class="chip-dot"></span>
+               <span class="js-video-chip-text">첫 클립 미리보기</span>
+             </div>`
+          : `<div class="card-preview-chip">
+               <span class="chip-dot"></span>
+               <span>첫 슬라이드 미리보기</span>
+             </div>`;
 
         return `
-          <article class="resource-card" id="card-${item.id}">
-            <!-- 16:9 Thumbnail Stage Header -->
+          <article class="resource-card" id="card-${item.id}" data-has-video="${isVideoItem ? 'true' : 'false'}">
+            <!-- 16:9 Real 1st-Slide / 1st-Clip Preview Frame -->
             <div class="card-thumb-container">
               <div class="card-thumb-aspect">
-                <div class="card-thumb-bg">
-                  <img src="assets/logo/lremettre_emblem.png" alt="L.ReMeTTRE" class="thumb-watermark">
-                  <div class="thumb-center-badge">
-                    <span class="thumb-glow-icon">${thumbCenterIcon}</span>
-                    <span class="thumb-deck-type">${thumbDeckType}</span>
-                  </div>
-                </div>
+                ${previewMediaHtml}
 
-                <div class="card-thumb-top-meta">
-                  <span class="card-category-badge">${badgeText}</span>
-                  <span class="card-version-tag">${pageCountBadge}</span>
-                </div>
+                <span class="card-pill-badge-left">${leftPillText}</span>
 
                 ${webDeckUrl ? `
-                  <a href="${webDeckUrl}" class="card-thumb-hover-link" target="_blank" title="클릭 시 바로보기">
-                    <div class="hover-play-circle">
-                      <span>▶</span>
+                  <a href="${webDeckUrl}" class="card-quick-circle-right" target="_blank" title="${launchLabel}">
+                    ${isVideoItem ? '▶' : '⛶'}
+                  </a>
+                ` : ''}
+
+                ${previewChipHtml}
+
+                ${webDeckUrl ? `
+                  <a href="${webDeckUrl}" class="card-thumb-hover-link" target="_blank" title="${launchLabel}">
+                    <div class="hover-play-pill">
+                      <span>${launchIcon}</span>
+                      <span>${launchLabel}</span>
                     </div>
-                    <span class="hover-play-label">${launchLabel}</span>
                   </a>
                 ` : ''}
               </div>
@@ -596,41 +492,94 @@
 
             <!-- Card Content Body -->
             <div class="card-body-compact">
+              <div class="card-meta-stars-row">
+                <span class="card-cat-tag">● ${item.category_name}</span>
+                <span class="card-date-tag">${item.date || ''}</span>
+              </div>
               <h3 class="card-title" title="${item.title}">${item.title}</h3>
-              ${item.subtitle ? `<div class="card-subtitle" title="${item.subtitle}">${item.subtitle}</div>` : ''}
-              <p class="card-description">${item.description}</p>
+              <div class="card-subtitle" title="${item.subtitle || item.description}">${item.subtitle || item.description}</div>
             </div>
 
-            <!-- Card Footer: Actions -->
+            <!-- Card Footer: Launch & Security Downloads -->
             <div class="card-footer-compact">
-              ${launchBtn}
+              ${webDeckUrl ? `
+                <a href="${webDeckUrl}" class="btn-deck-launch" target="_blank" title="${launchLabel}">
+                  <span>${launchIcon}</span> ${launchLabel}
+                </a>
+              ` : ''}
               ${downloadBtnsHtml}
             </div>
           </article>
         `;
       })
       .join('');
+
+    bindVideoHoverPreviews();
   }
 
-  // 필터 탭 이벤트
-  filterButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCategory = btn.dataset.category;
+  /**
+   * ==========================================================================
+   * 5. 이벤트 바인딩 & 초기 로드
+   * ==========================================================================
+   */
+  async function loadResources() {
+    try {
+      const response = await fetch(`data/resources.json?t=${Date.now()}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      resourcesData = await response.json();
+      renderSummaryDashboard();
       renderResources();
-    });
-  });
-
-  // 검색 인풋 이벤트
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      renderResources();
-    });
+    } catch (err) {
+      console.warn('Failed to fetch resources.json:', err);
+    }
   }
 
-  // 초기화 실행
+  function initEvents() {
+    // 알약형 필터 탭
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setCategory(btn.dataset.category, false);
+      });
+    });
+
+    // 서브 네비게이션 6대 카테고리 버튼
+    document.querySelectorAll('.sub-cat-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setCategory(btn.dataset.category, true);
+      });
+    });
+
+    // 상단 메인 네비게이션 링크
+    document.querySelectorAll('.main-nav-link').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const navCat = link.dataset.navCat;
+        if (navCat) {
+          e.preventDefault();
+          setCategory(navCat, navCat !== 'all');
+          if (navCat === 'all') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      });
+    });
+
+    // 하단 프로모 배너 카테고리 점프 버튼
+    document.querySelectorAll('.js-jump-cat').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setCategory(btn.dataset.category, true);
+      });
+    });
+
+    // 실시간 검색창
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderResources();
+      });
+    }
+  }
+
   initHeroLiveStage();
+  initEvents();
   loadResources();
 })();

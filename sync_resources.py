@@ -1,35 +1,45 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-르메뜨레(L.REMETTRE) 공식 자료실 자동 동기화 엔진
-docs/ 하위 폴더의 모든 문서와 자료를 자동으로 스캔하여 data/resources.json을 갱신합니다.
+르메뜨레(L.REMETTRE) 공식 자료실 자동 동기화 & 미리보기 썸네일 생성 엔진 (v2.0 White Edition)
+- 6대 공식 카테고리 체계:
+  01_프레젠테이션_강의 (프레젠테이션&강의)
+  02_문서_자료 (문서 자료)
+  03_행사_영상 (행사 영상)
+  04_후기_영상 (후기 영상)
+  05_분석_자료 (분석 자료)
+  06_각종_양식 (각종 양식)
+- 모든 PDF/PPTX의 첫 슬라이드(1페이지)와 MP4 영상의 첫 클립 고해상도 썸네일을
+  assets/thumbs/ 폴더에 자동 추출하여 카드 미리보기를 100% 보장합니다.
 """
 
 import os
 import re
+import io
 import json
 import datetime
 import urllib.parse
+from PIL import Image
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(SCRIPT_DIR, "docs")
+THUMBS_DIR = os.path.join(SCRIPT_DIR, "assets", "thumbs")
 OUTPUT_JSON = os.path.join(SCRIPT_DIR, "data", "resources.json")
 
-# 폴더명 매핑 규칙
+# 6대 공식 카테고리 폴더명 매핑 규칙
 CATEGORY_MAP = {
-    "01_프레젠테이션_강의": {"category": "presentation", "name": "프레젠테이션 & 강의", "badge": "강의/발표"},
-    "presentations": {"category": "presentation", "name": "프레젠테이션 & 강의", "badge": "강의/발표"},
-    "02_제품_시험성적서": {"category": "certificate", "name": "제품 시험성적서", "badge": "공식인증"},
-    "certificates": {"category": "certificate", "name": "제품 시험성적서", "badge": "공식인증"},
-    "03_홍보_브로슈어": {"category": "brochure", "name": "홍보 & 브로슈어", "badge": "브랜드홍보"},
-    "brochures": {"category": "brochure", "name": "홍보 & 브로슈어", "badge": "브랜드홍보"},
-    "04_공식_서식": {"category": "forms", "name": "공식 서식", "badge": "업무양식"},
-    "forms": {"category": "forms", "name": "공식 서식", "badge": "업무양식"},
-    "05_영상 자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
-    "05.영상 자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
-    "05_영상_자료": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
-    "05_홍보_영상": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
-    "videos": {"category": "video", "name": "영상 자료", "badge": "공식영상"},
+    "01_프레젠테이션_강의": {"category": "presentation", "name": "프레젠테이션&강의", "badge": "강의/발표"},
+    "presentations": {"category": "presentation", "name": "프레젠테이션&강의", "badge": "강의/발표"},
+    "02_문서_자료": {"category": "document", "name": "문서 자료", "badge": "공식문서"},
+    "02_제품_시험성적서": {"category": "document", "name": "문서 자료", "badge": "공식문서"},
+    "03_홍보_브로슈어": {"category": "document", "name": "문서 자료", "badge": "공식문서"},
+    "03_행사_영상": {"category": "event_video", "name": "행사 영상", "badge": "행사영상"},
+    "04_후기_영상": {"category": "review_video", "name": "후기 영상", "badge": "후기영상"},
+    "05_영상 자료": {"category": "review_video", "name": "후기 영상", "badge": "후기영상"},
+    "05.영상 자료": {"category": "review_video", "name": "후기 영상", "badge": "후기영상"},
+    "05_분석_자료": {"category": "analysis", "name": "분석 자료", "badge": "데이터분석"},
+    "06_각종_양식": {"category": "forms", "name": "각종 양식", "badge": "공식양식"},
+    "04_공식_서식": {"category": "forms", "name": "각종 양식", "badge": "공식양식"},
 }
 
 def format_size(bytes_size):
@@ -46,14 +56,103 @@ def extract_version(text):
 
 def clean_title(filename):
     base, _ = os.path.splitext(filename)
-    # 불필요한 접두/접미 정리
     cleaned = base.replace('_', ' ').replace('-', ' ').strip()
     return cleaned
+
+def generate_pdf_thumbnail_and_pages(pdf_path, group_key):
+    """
+    PDF의 첫 슬라이드(1페이지)를 고해상도 썸네일(assets/thumbs/{group_key}.jpg)로 저장하고
+    전체 페이지 수를 함께 반환합니다.
+    """
+    os.makedirs(THUMBS_DIR, exist_ok=True)
+    thumb_filename = f"{group_key}.jpg"
+    thumb_full_path = os.path.join(THUMBS_DIR, thumb_filename)
+    thumb_rel_url = f"assets/thumbs/{thumb_filename}"
+    page_count = None
+
+    try:
+        import pymupdf
+        doc = pymupdf.open(pdf_path)
+        page_count = len(doc)
+        if page_count > 0:
+            # 파일 수정 시각 비교하여 썸네일이 없거나 원본이 갱신되었을 때만 재생성
+            need_gen = not os.path.exists(thumb_full_path) or (os.path.getmtime(pdf_path) > os.path.getmtime(thumb_full_path))
+            if need_gen:
+                page = doc[0]
+                rect = page.rect
+                scale = 960.0 / max(rect.width, 1)
+                pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                img.save(thumb_full_path, format="JPEG", quality=88, optimize=True)
+                print(f"[첫 슬라이드 썸네일 생성] {os.path.basename(pdf_path)} -> {thumb_rel_url} ({page_count}P)")
+        doc.close()
+        if os.path.exists(thumb_full_path):
+            return thumb_rel_url, page_count
+    except Exception as e:
+        print(f"[PDF 썸네일 생성 스킵] {os.path.basename(pdf_path)}: {e}")
+
+    return (thumb_rel_url if os.path.exists(thumb_full_path) else None), page_count
+
+def generate_video_thumbnail_and_duration(video_path, group_key):
+    """
+    MP4 영상의 첫 클립 대표 프레임(약 1.0초 지점)을 고해상도 썸네일로 추출하고
+    영상 재생 시간(MM:SS)을 함께 반환합니다.
+    """
+    os.makedirs(THUMBS_DIR, exist_ok=True)
+    thumb_filename = f"{group_key}.jpg"
+    thumb_full_path = os.path.join(THUMBS_DIR, thumb_filename)
+    thumb_rel_url = f"assets/thumbs/{thumb_filename}"
+    duration_str = None
+
+    try:
+        import cv2
+        cap = cv2.VideoCapture(video_path)
+        if cap.isOpened():
+            fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+            frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0
+            if fps > 0 and frame_count > 0:
+                total_sec = int(round(frame_count / fps))
+                mins, secs = divmod(total_sec, 60)
+                duration_str = f"{mins:02d}:{secs:02d}"
+
+            need_gen = not os.path.exists(thumb_full_path) or (os.path.getmtime(video_path) > os.path.getmtime(thumb_full_path))
+            if need_gen:
+                # 첫 클립(약 1.0초 지점 또는 전체의 5% 지점 중 빠른 프레임)에서 가장 선명한 프레임 추출
+                target_frame = min(int(fps * 1.0), max(0, int(frame_count - 1)))
+                cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
+                ret, frame = cap.read()
+                if not ret or frame is None:
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    ret, frame = cap.read()
+                if ret and frame is not None:
+                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    img = Image.fromarray(rgb)
+                    if img.width > 960:
+                        ratio = 960.0 / img.width
+                        img = img.resize((960, int(img.height * ratio)), Image.Resampling.LANCZOS)
+                    img.save(thumb_full_path, format="JPEG", quality=88, optimize=True)
+                    print(f"[첫 클립 썸네일 생성] {os.path.basename(video_path)} -> {thumb_rel_url} ({duration_str})")
+            cap.release()
+    except Exception as e:
+        print(f"[영상 썸네일 생성 스킵] {os.path.basename(video_path)}: {e}")
+
+    return (thumb_rel_url if os.path.exists(thumb_full_path) else None), duration_str
 
 def scan_docs():
     if not os.path.exists(DOCS_DIR):
         print(f"Docs folder not found: {DOCS_DIR}")
         return []
+
+    # 6대 공식 폴더가 없으면 자동 생성
+    for default_folder in [
+        "01_프레젠테이션_강의",
+        "02_문서_자료",
+        "03_행사_영상",
+        "04_후기_영상",
+        "05_분석_자료",
+        "06_각종_양식"
+    ]:
+        os.makedirs(os.path.join(DOCS_DIR, default_folder), exist_ok=True)
 
     # 0. 90MB 초과 대용량 파일 자동 최적화/스마트 압축 (GitHub 100MB 제한 원천 방지)
     try:
@@ -64,7 +163,7 @@ def scan_docs():
     except Exception as e:
         print(f"[대용량 파일 압축 스킵] {e}")
 
-    # 0-1. PPTX 파일 중 PDF가 없는 파일 자동 PDF 변환 (웹 뷰어 프레젠테이션 시작 버튼 100% 보장)
+    # 0-1. PPTX 파일 중 PDF가 없는 파일 자동 PDF 변환 (웹 뷰어 프레젠테이션 시작 & 첫 슬라이드 미리보기 100% 보장)
     try:
         import win32com.client
         ppt_app = None
@@ -75,13 +174,11 @@ def scan_docs():
                 if rf.lower().endswith('.pptx') and not rf.startswith('~$'):
                     rf_path = os.path.join(r_root, rf)
                     target_pdf = os.path.join(r_root, os.path.splitext(rf)[0] + '.pdf')
-                    need_convert = (not os.path.exists(target_pdf)) or (os.path.getmtime(rf_path) > os.path.getmtime(target_pdf) + 2)
-                    if need_convert:
+                    if not os.path.exists(target_pdf):
                         try:
                             if ppt_app is None:
                                 ppt_app = win32com.client.Dispatch("PowerPoint.Application")
-                            reason = "신규 생성" if not os.path.exists(target_pdf) else "PPTX 수정 감지 -> PDF 재변환"
-                            print(f"[PPTX -> PDF 자동 변환 ({reason})] {rf}...")
+                            print(f"[PPTX -> PDF 자동 변환] {rf}...")
                             pres = ppt_app.Presentations.Open(os.path.abspath(rf_path), WithWindow=False)
                             pres.SaveAs(os.path.abspath(target_pdf), 32)
                             pres.Close()
@@ -93,10 +190,10 @@ def scan_docs():
                 ppt_app.Quit()
             except Exception:
                 pass
-    except Exception as e:
+    except Exception:
         pass
 
-    # 기존 resources.json 이 있다면 커스텀 메타데이터(설명문, 키포인트, web_deck_url 등) 보존
+    # 기존 resources.json 커스텀 메타데이터 보존
     existing_meta = {}
     if os.path.exists(OUTPUT_JSON):
         try:
@@ -108,180 +205,71 @@ def scan_docs():
         except Exception as e:
             print(f"Warning: Could not read existing json: {e}")
 
-    # 리더십 강의 기본 프리셋
-    existing_meta['leadership-masterclass'] = {
-        "title": "변화하는 시대, 리더십의 진짜 온도",
-        "subtitle": "앞장서서 빨리 갈 것인가, 함께 끝까지 갈 것인가",
-        "badge": "NEW MASTERCLASS",
-        "web_deck_url": "presentation.html",
-        "slide_count": 16,
-        "author": "유정환 교수 / L.REMETTRE",
-        "description": "르메뜨레 비즈니스 그룹의 코어 에토스(Core Ethos)를 담은 16개 핵심 슬라이드 프레젠테이션입니다. 독선적 속도전에서 벗어나 구성원과 함께 끝까지 완주하는 진짜 리더십의 온도, 스티브 잡스의 실수와 성찰, 크루즈선 시스템, 티업(Tee-Up) 문화, 과학적 원리 기반 신뢰 마케팅을 다룹니다.",
-        "key_points": [
-            "16:9 와이드스크린 시네마틱 프레젠테이션 완비 (F11 풀스크린 지원)",
-            "화이트 에디션 ☀️ / 옵시디언 다크 에디션 🌙 원클릭 실시간 전환",
-            "각 슬라이드별 핵심 대조 카드(레드/그린/골드) 및 코어 명언 탑재",
-            "웹 브라우저 즉시 재생 + 네이티브 PPTX/PDF 원클릭 다운로드"
-        ]
+    # 주요 자료 상세 프리셋
+    presets_map = {
+        'leadership-masterclass': {
+            "title": "변화하는 시대, 리더십의 진짜 온도",
+            "subtitle": "앞장서서 빨리 갈 것인가, 함께 끝까지 갈 것인가",
+            "badge": "MASTERCLASS",
+            "web_deck_url": "presentation.html",
+            "slide_count": 16,
+            "author": "유정환 교수 / L.REMETTRE",
+            "description": "르메뜨레 비즈니스 그룹의 코어 에토스(Core Ethos)를 담은 16개 핵심 슬라이드 프레젠테이션입니다. 구성원과 함께 끝까지 완주하는 진짜 리더십의 온도와 신뢰 마케팅을 다룹니다.",
+        },
+        'presentation-오크라PPT': {
+            "title": "르메뜨레 오크라(Okra) 제품 프레젠테이션",
+            "subtitle": "식물성 뮤실리지 오크라 핵심 원료 및 제품 라인업",
+            "badge": "PRODUCT DECK",
+            "author": "L.REMETTRE R&D / PRODUCT GROUP",
+            "description": "식물성 다당류 뮤실리지(Mucilage)가 풍부한 오크라 원료의 핵심 메커니즘과 르메뜨레 프리미엄 제품 라인업을 소개하는 공식 제품 프레젠테이션입니다.",
+        },
+        'presentation-LReMeTTReNEWPPT': {
+            "title": "르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학",
+            "subtitle": "REMETTRE (Restore) · 가장 활력 넘치던 본연의 상태로 당신의 삶을 되돌립니다",
+            "badge": "OFFICIAL DECK",
+            "author": "L.REMETTRE R&D / BRAND GROUP",
+            "slide_count": 27,
+            "description": "르메뜨레의 세포 과학 메커니즘과 프리미엄 웰니스 브랜드 비전을 담은 27페이지 공식 메인 피치덱입니다. 웹 브라우저에서 바로 시네마틱 프레젠테이션으로 발표할 수 있습니다.",
+        },
+        'presentation-lremettre사업설명자료세미나용V14': {
+            "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)",
+            "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 공식 자료",
+            "badge": "LATEST DECK",
+            "author": "L.REMETTRE BUSINESS GROUP",
+            "slide_count": 50,
+            "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 50페이지 공식 사업설명회 최신 V1.4 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
+        },
+        'presentation-르메뜨레세미나OfficialV30': {
+            "title": "르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)",
+            "subtitle": "르메뜨레 브랜드 · 3대 핵심 바이오 솔루션 · 세미나 공식 발표 자료",
+            "badge": "OFFICIAL V3.0",
+            "author": "L.REMETTRE BUSINESS GROUP",
+            "description": "르메뜨레의 핵심 제품 라인업과 과학적 메커니즘, 세미나 핵심 내용을 집약한 Official V3.0 공식 발표 자료입니다. 웹 뷰어 발표 및 PPTX/PDF 다운로드를 모두 지원합니다.",
+        },
+        'presentation-르메뜨레프레젠테이션v21SP에디션': {
+            "title": "르메뜨레 공식 프레젠테이션 (v2.1 SP 에디션)",
+            "subtitle": "소이 펩타이드(SP) 초저분자 세포 영양 & 비즈니스 스페셜 에디션",
+            "badge": "SP EDITION",
+            "author": "L.REMETTRE R&D / BUSINESS GROUP",
+            "description": "500 Da 이하 초저분자 소이 펩타이드의 핵심 과학 데이터와 르메뜨레 비즈니스 경쟁력을 집약한 v2.1 SP 스페셜 에디션 프레젠테이션입니다.",
+        },
+        'review_video-02르메뜨레회원인바디건강다큐HUD비실명판': {
+            "title": "르메뜨레 회원 인바디 변화 건강다큐 (HUD 비실명판)",
+            "subtitle": "실제 회원 체성분·내장지방·세포영양 데이터 분석 다큐멘터리 후기 영상",
+            "badge": "DOCU VIDEO",
+            "author": "L.REMETTRE MEDIA GROUP",
+            "description": "르메뜨레 3-Step 바이오 솔루션 섭취 전후 실제 회원의 인바디(InBody) 체성분 및 내장지방 변화 추이를 시네마틱 HUD 그래픽으로 정밀 분석한 건강 다큐멘터리 후기 영상입니다.",
+        },
+        'review_video-04르메뜨레회원혈액검진클린V2비실명판': {
+            "title": "르메뜨레 회원 혈액검진 데이터 분석 (클린 V2 비실명판)",
+            "subtitle": "실제 회원 혈액검진 지표 개선 사례 시네마틱 브리핑 후기 영상",
+            "badge": "CLINICAL VIDEO",
+            "author": "L.REMETTRE MEDIA GROUP",
+            "description": "실제 회원의 건강검진 혈액 지표 변화를 객관적 수치와 시각 데이터로 알기 쉽게 정리한 클린 V2 브리핑 후기 영상(비실명판)입니다. 브라우저에서 즉시 전체화면 재생이 가능합니다.",
+        },
     }
-
-    # REBOOM 프로젝트 프리셋
-    existing_meta['presentation-REBOOM프로젝트PPT'] = {
-        "title": "REBOOM 프로젝트 공식 프레젠테이션",
-        "subtitle": "르메뜨레 REBOOM 혁신 프로젝트 기획 및 실행 전략",
-        "badge": "NEW DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레의 신규 성장 동력 및 비즈니스 비전을 담은 REBOOM 프로젝트 공식 발표 자료입니다. 브라우저에서 바로 열어 F11 풀스크린으로 발표할 수 있습니다.",
-        "key_points": [
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11 풀스크린)",
-            "방향키(←, →) 및 터치 제스처 슬라이드 넘김 완비",
-            "화이트/다크 배경 테마 실시간 토글 지원",
-            "고화질 공식 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 사업설명자료 프리셋
-    existing_meta['presentation-lremettre사업설명자료84세미나용'] = {
-        "title": "르메뜨레 사업설명 공식 세미나 피치덱",
-        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 공식 자료",
-        "badge": "BUSINESS DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 성장 로드맵을 다루는 공식 세미나 사업설명회 프레젠테이션입니다. Full HD 화질을 유지하면서 최적화 압축되었습니다.",
-        "key_points": [
-            "사업설명회 공식 발표용 고화질 파워포인트 (PPTX)",
-            "스마트 최적화 압축 완료 (153MB -> 62MB, Full HD 유지)",
-            "인터넷 연결 환경에서 원클릭 고속 다운로드 제공"
-        ]
-    }
-
-    # 사업설명자료 V1.2 프리셋
-    existing_meta['presentation-lremettre사업설명자료세미나용V12'] = {
-        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.2 최신판)",
-        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 자료",
-        "badge": "LATEST DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 공식 사업설명회 최신 V1.2 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
-        "key_points": [
-            "2026 최신 V1.2 공식 사업설명회 세미나 덱",
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "Full HD 화질 유지 스마트 최적화 압축 (50.5MB) 완료",
-            "공식 고화질 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 사업설명자료 V1.0 프리셋
-    existing_meta['presentation-lremettre사업설명자료세미나용V10'] = {
-        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.0)",
-        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 공식 세미나 자료",
-        "badge": "BUSINESS DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레 비즈니스 모델 및 사업 비전을 다루는 공식 세미나 V1.0 프레젠테이션입니다. 웹 뷰어에서 바로 발표할 수 있습니다.",
-        "key_points": [
-            "공식 사업설명회 세미나 프레젠테이션 (V1.0)",
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "공식 고화질 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 헬쯔백 B2B 프리셋
-    existing_meta['presentation-주헬쯔백B2B발표PPT'] = {
-        "title": "(주)헬쯔백 B2B 파트너십 프레젠테이션",
-        "subtitle": "헬쯔백 비즈니스 제안 및 B2B 협업 실행 전략",
-        "badge": "B2B DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레와 (주)헬쯔백 간의 B2B 파트너십 구축 및 유통 확장을 위한 공식 비즈니스 피치덱입니다. 웹 브라우저에서 실시간으로 발표할 수 있습니다.",
-        "key_points": [
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "헬쯔백 B2B 비즈니스 모델 및 유통 로드맵 수록",
-            "공식 고화질 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 오크라 PPT 프리셋
-    existing_meta['presentation-오크라PPT'] = {
-        "title": "르메뜨레 오크라(Okra) 제품 프레젠테이션",
-        "subtitle": "식물성 뮤신 오크라 핵심 원료 및 제품 라인업",
-        "badge": "PRODUCT DECK",
-        "author": "L.REMETTRE R&D / PRODUCT GROUP",
-        "description": "식물성 뮤신이 풍부한 오크라 원료의 핵심 메커니즘과 르메뜨레 프리미엄 제품 라인업을 소개하는 공식 제품 프레젠테이션입니다.",
-        "key_points": [
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "오크라 핵심 원료 효능 및 제품 경쟁력 수록",
-            "공식 고화질 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 르메뜨레 신규 메인 피치덱 (27p) 프리셋
-    existing_meta['presentation-LReMeTTReNEWPPT'] = {
-        "title": "르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학",
-        "subtitle": "REMETTRE (Restore) · 가장 활력 넘치던 본연의 상태로 당신의 삶을 되돌립니다",
-        "badge": "OFFICIAL DECK",
-        "author": "L.REMETTRE R&D / BRAND GROUP",
-        "slide_count": 27,
-        "description": "르메뜨레의 세포 과학 메커니즘과 프리미엄 웰니스 브랜드 비전을 담은 27페이지 공식 메인 피치덱입니다. 웹 브라우저에서 바로 시네마틱 프레젠테이션으로 발표할 수 있습니다.",
-        "key_points": [
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11 풀스크린)",
-            "27페이지 공식 메인 브랜드 및 세포 과학 메커니즘 수록",
-            "고화질 공식 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 사업설명자료 V1.4 프리셋
-    existing_meta['presentation-lremettre사업설명자료세미나용V14'] = {
-        "title": "르메뜨레 사업설명 공식 세미나 피치덱 (V1.4 최신판)",
-        "subtitle": "글로벌 웰니스 비즈니스 비전 및 사업설명회 최신 세미나 공식 자료",
-        "badge": "LATEST DECK",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "slide_count": 50,
-        "description": "르메뜨레 비즈니스 모델, 보상 체계 및 글로벌 비전을 다루는 50페이지 공식 사업설명회 최신 V1.4 프레젠테이션입니다. 브라우저에서 바로 열람하거나 F11 전체화면으로 발표할 수 있습니다.",
-        "key_points": [
-            "2026 최신 V1.4 공식 사업설명회 세미나 덱 (50P)",
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "고화질 공식 PDF 원본 즉시 다운로드 제공"
-        ]
-    }
-
-    # 르메뜨레 세미나 Official V3.0 프리셋
-    existing_meta['presentation-르메뜨레세미나OfficialV30'] = {
-        "title": "르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)",
-        "subtitle": "르메뜨레 브랜드 · 3대 핵심 바이오 솔루션 · 세미나 공식 발표 자료",
-        "badge": "OFFICIAL V3.0",
-        "author": "L.REMETTRE BUSINESS GROUP",
-        "description": "르메뜨레의 핵심 제품 라인업과 과학적 메커니즘, 세미나 핵심 내용을 집약한 Official V3.0 공식 발표 자료입니다. 웹 뷰어 발표 및 PPTX/PDF 다운로드를 모두 지원합니다.",
-        "key_points": [
-            "Official V3.0 최신 공식 세미나 프레젠테이션",
-            "16:9 와이드스크린 시네마틱 프레젠테이션 지원 (F11)",
-            "편집 가능한 원본 PPTX 및 고화질 PDF 동시 제공"
-        ]
-    }
-
-    # 영상 02: 회원 인바디 건강다큐 HUD 비실명판 프리셋
-    existing_meta['video-02르메뜨레회원인바디건강다큐HUD비실명판'] = {
-        "title": "르메뜨레 회원 인바디 변화 건강다큐 (HUD 비실명판)",
-        "subtitle": "실제 회원 체성분·내장지방·세포영양 데이터 분석 다큐멘터리 영상",
-        "badge": "DOCU VIDEO",
-        "author": "L.REMETTRE MEDIA GROUP",
-        "description": "르메뜨레 3-Step 바이오 솔루션 섭취 전후 실제 회원의 인바디(InBody) 체성분 및 내장지방 변화 추이를 시네마틱 HUD 그래픽으로 정밀 분석한 건강 다큐멘터리 영상(비실명판)입니다.",
-        "key_points": [
-            "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
-            "회원 보호를 위한 비실명 처리 완료본",
-            "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
-        ]
-    }
-
-    # 영상 04: 회원 혈액검진 클린V2 비실명판 프리셋
-    existing_meta['video-04르메뜨레회원혈액검진클린V2비실명판'] = {
-        "title": "르메뜨레 회원 혈액검진 데이터 분석 (클린 V2 비실명판)",
-        "subtitle": "실제 회원 혈액검진 지표 개선 사례 시네마틱 브리핑 영상",
-        "badge": "CLINICAL VIDEO",
-        "author": "L.REMETTRE MEDIA GROUP",
-        "description": "실제 회원의 건강검진 혈액 지표 변화를 객관적 수치와 시각 데이터로 알기 쉽게 정리한 클린 V2 브리핑 영상(비실명판)입니다. 브라우저에서 즉시 전체화면 재생이 가능합니다.",
-        "key_points": [
-            "Full HD 16:9 시네마틱 웹 플레이어 즉시 재생 지원",
-            "혈액검진 핵심 지표 전후 비교 클린 V2 에디션 (비실명판)",
-            "세미나 및 미팅 현장 활용 고화질 MP4 원본 다운로드"
-        ]
-    }
+    for pk, pv in presets_map.items():
+        existing_meta[pk] = {**existing_meta.get(pk, {}), **pv}
 
     resources = []
     groups = {}
@@ -294,13 +282,20 @@ def scan_docs():
 
         cat_info = CATEGORY_MAP.get(top_folder)
         if not cat_info:
-            if "영상" in top_folder or "video" in top_folder.lower():
-                cat_info = {"category": "video", "name": "영상 자료", "badge": "공식영상"}
+            if "행사" in top_folder:
+                cat_info = {"category": "event_video", "name": "행사 영상", "badge": "행사영상"}
+            elif "후기" in top_folder or "영상" in top_folder or "video" in top_folder.lower():
+                cat_info = {"category": "review_video", "name": "후기 영상", "badge": "후기영상"}
+            elif "분석" in top_folder:
+                cat_info = {"category": "analysis", "name": "분석 자료", "badge": "데이터분석"}
+            elif "문서" in top_folder or "성적서" in top_folder or "브로슈어" in top_folder:
+                cat_info = {"category": "document", "name": "문서 자료", "badge": "공식문서"}
+            elif "양식" in top_folder or "서식" in top_folder:
+                cat_info = {"category": "forms", "name": "각종 양식", "badge": "공식양식"}
             else:
-                cat_info = {"category": "etc", "name": top_folder, "badge": "일반자료"}
+                cat_info = {"category": "presentation", "name": "프레젠테이션&강의", "badge": "강의/발표"}
 
         for fname in files:
-            # 숨김 파일이나 임시 파일 무시
             if fname.startswith('.') or fname.startswith('~$'):
                 continue
 
@@ -316,12 +311,10 @@ def scan_docs():
             mtime = os.path.getmtime(file_path)
             date_str = datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
 
-            # 그룹 키 생성 (리더십 강의 파일 등 동일 시리즈 묶기)
             stem = os.path.splitext(fname)[0]
             if "leadership" in stem.lower() or "리더십" in stem:
                 group_key = "leadership-masterclass"
             else:
-                # 일반 파일은 파일명을 기반으로 고유 키
                 clean_key = re.sub(r'[^a-zA-Z0-9가-힣]', '', stem)
                 group_key = f"{cat_info['category']}-{clean_key}"
 
@@ -334,10 +327,12 @@ def scan_docs():
                     "date": date_str,
                     "version": extract_version(fname),
                     "files": {},
-                    "primary_name": clean_title(fname)
+                    "primary_name": clean_title(fname),
+                    "pdf_disk_path": None,
+                    "video_disk_path": None,
+                    "image_rel_path": None,
                 }
 
-            # 파일 타입별 등록
             if ext in ['.pptx', '.ppt']:
                 groups[group_key]["files"]["pptx"] = {
                     "url": rel_file_path,
@@ -350,6 +345,7 @@ def scan_docs():
                     "name": fname,
                     "size": size_str
                 }
+                groups[group_key]["pdf_disk_path"] = file_path
             elif ext in ['.xlsx', '.xls']:
                 groups[group_key]["files"]["excel"] = {
                     "url": rel_file_path,
@@ -362,6 +358,7 @@ def scan_docs():
                     "name": fname,
                     "size": size_str
                 }
+                groups[group_key]["image_rel_path"] = rel_file_path
             elif ext == '.docx':
                 groups[group_key]["files"]["word"] = {
                     "url": rel_file_path,
@@ -374,20 +371,34 @@ def scan_docs():
                     "name": fname,
                     "size": size_str
                 }
+                groups[group_key]["video_disk_path"] = file_path
 
-    # 최종 결과 빌드
+    # 최종 결과 빌드 + 첫 슬라이드/첫 클립 썸네일 자동 생성
     for gid, ginfo in groups.items():
-        # 기존 메타데이터가 있으면 우선 적용
         preset = existing_meta.get(gid, {})
 
         title = preset.get("title", ginfo["primary_name"])
-        subtitle = preset.get("subtitle", "")
+        subtitle = preset.get("subtitle", f"{ginfo['category_name']} 공식 아카이브 자료")
         badge = preset.get("badge", ginfo["badge"])
-        desc = preset.get("description", f"{ginfo['category_name']} 공식 자료입니다. 브라우저에서 열람하거나 다운로드하여 프레젠테이션 및 업무에 활용하세요.")
+        desc = preset.get("description", f"{ginfo['category_name']} 공식 자료입니다. 브라우저에서 첫 화면 미리보기 및 전체화면 발표/재생, 보안 다운로드를 지원합니다.")
+
+        thumbnail_url = None
+        detected_pages = None
+        detected_duration = None
+
+        if ginfo["pdf_disk_path"] and os.path.exists(ginfo["pdf_disk_path"]):
+            thumbnail_url, detected_pages = generate_pdf_thumbnail_and_pages(ginfo["pdf_disk_path"], gid)
+        elif ginfo["video_disk_path"] and os.path.exists(ginfo["video_disk_path"]):
+            thumbnail_url, detected_duration = generate_video_thumbnail_and_duration(ginfo["video_disk_path"], gid)
+        elif ginfo["image_rel_path"]:
+            thumbnail_url = ginfo["image_rel_path"]
+
+        slide_count = preset.get("slide_count") or detected_pages
+
         key_points = preset.get("key_points", [
-            f"공식 파일 포맷 지원: {', '.join([k.upper() for k in ginfo['files'].keys()])}",
-            f"최신 업데이트 일자: {ginfo['date']}",
-            "인터넷 연결 환경에서 원클릭 조회 및 다운로드 가능"
+            f"지원 포맷: {', '.join([k.upper() for k in ginfo['files'].keys()])}",
+            f"업데이트 일자: {ginfo['date']}",
+            "브라우저 즉시 열람/재생 및 보안 인증 다운로드 지원"
         ])
 
         item = {
@@ -402,40 +413,49 @@ def scan_docs():
             "tags": [ginfo["category_name"], ginfo["version"]],
             "description": desc,
             "key_points": key_points,
-            "downloads": ginfo["files"]
+            "downloads": ginfo["files"],
+            "thumbnail": thumbnail_url,
         }
 
-        if "web_deck_url" in preset:
-            item["web_deck_url"] = preset["web_deck_url"]
+        if slide_count:
+            item["slide_count"] = slide_count
+        if detected_duration:
+            item["duration"] = detected_duration
+        if "author" in preset:
+            item["author"] = preset["author"]
+
+        if "web_deck_url" in preset and preset["web_deck_url"] == "presentation.html":
+            item["web_deck_url"] = "presentation.html"
         elif "pdf" in ginfo["files"]:
-            pdf_abs = os.path.join(SCRIPT_DIR, ginfo["files"]["pdf"]["url"])
-            ver_ts = int(os.path.getmtime(pdf_abs)) if os.path.exists(pdf_abs) else 1
             encoded_pdf = urllib.parse.quote(ginfo["files"]["pdf"]["url"])
             encoded_title = urllib.parse.quote(title)
-            item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}&v={ver_ts}"
+            item["web_deck_url"] = f"viewer.html?file={encoded_pdf}&title={encoded_title}"
         elif "video" in ginfo["files"]:
             encoded_video = urllib.parse.quote(ginfo["files"]["video"]["url"])
             encoded_title = urllib.parse.quote(title)
             item["web_deck_url"] = f"viewer.html?file={encoded_video}&title={encoded_title}&type=video"
 
-        if "author" in preset:
-            item["author"] = preset["author"]
-        if "slide_count" in preset:
-            item["slide_count"] = preset["slide_count"]
-
         resources.append(item)
 
-    # 정렬: 프레젠테이션 우선, 그 다음 최신순
-    resources.sort(key=lambda x: (0 if x["category"] == "presentation" else 1, x["date"]), reverse=False)
+    # 카테고리 정렬 우선순위
+    cat_order = {
+        "presentation": 0,
+        "document": 1,
+        "event_video": 2,
+        "review_video": 3,
+        "analysis": 4,
+        "forms": 5,
+    }
+    resources.sort(key=lambda x: (cat_order.get(x["category"], 9), x["date"]), reverse=False)
 
-    # JSON 저장
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
     with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
         json.dump(resources, f, ensure_ascii=False, indent=2)
 
     print(f"Successfully synced {len(resources)} resources to {OUTPUT_JSON}")
     for r in resources:
-        print(f" - [{r['category_name']}] {r['title']} ({len(r['downloads'])} files)")
+        meta_tag = f"{r.get('slide_count')}P" if r.get('slide_count') else (r.get('duration') or r['version'])
+        print(f" - [{r['category_name']}] {r['title']} ({meta_tag} | thumb: {r.get('thumbnail')})")
 
 if __name__ == '__main__':
     scan_docs()

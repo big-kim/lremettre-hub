@@ -23,12 +23,12 @@
     }
 
     body.theme-white {
-      --bg-page: #F1ECE1;
-      --bg-stage: #FFFDF8;
-      --hud-bg: rgba(255, 253, 248, 0.94);
-      --hud-border: #E8E2D2;
+      --bg-page: #F8FAFC;
+      --bg-stage: #FFFFFF;
+      --hud-bg: rgba(255, 255, 255, 0.96);
+      --hud-border: #E2E8F0;
       --hud-text: #0F172A;
-      --gold: #B8860B;
+      --gold: #EC4899;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -253,12 +253,19 @@
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #B8860B 0%, #D4AF37 50%, #059669 100%);
+      background: linear-gradient(90deg, #EC4899 0%, #F43F5E 50%, #4F46E5 100%);
       transition: width 0.25s ease;
+    }
+
+    @media (max-width: 640px) {
+      .deck-title-pill { display: none; }
+      .top-hud { top: 10px; left: 12px; right: 12px; }
+      .hud-btn { padding: 7px 12px; font-size: 12px; }
+      #viewport-shell { padding: 56px 10px 70px; }
     }
   </style>
 </head>
-<body class="theme-dark">
+<body class="theme-white">
 
   <!-- Top HUD -->
   <header class="top-hud">
@@ -272,7 +279,7 @@
 
     <div class="hud-actions-right">
       <button id="btn-theme-toggle" class="hud-btn" title="배경 테마 전환 (단축키 T)">
-        <span>☀️</span> 화이트 배경
+        <span>🌙</span> 다크 배경
       </button>
       <button id="btn-fullscreen" class="hud-btn" title="전체화면 프레젠테이션 (단축키 F 또는 F11)">
         <span>⛶</span> 전체화면 (F11)
