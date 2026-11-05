@@ -24,9 +24,9 @@
   const stageCurrentIdx = document.getElementById('stage-current-idx');
   const stageTotalIdx = document.getElementById('stage-total-idx');
   const stageProgressFill = document.getElementById('stage-progress-fill');
-  const tabDeckCellScience = document.getElementById('tab-deck-cell-science');
+  const tabDeckV30Seminar = document.getElementById('tab-deck-v30-seminar');
   const tabDeckSpEdition = document.getElementById('tab-deck-sp-edition');
-  const tabDeckLeadership = document.getElementById('tab-deck-leadership');
+  const tabDeckCellScience = document.getElementById('tab-deck-cell-science');
   const btnTopLaunch = document.getElementById('btn-top-launch');
   const heroMainCta = document.getElementById('hero-main-cta');
 
@@ -38,7 +38,7 @@
       eyebrow: 'PRESENTATION',
       tone: 'tone-pink',
       icon: '📊',
-      defaultThumb: 'assets/thumbs/presentation-LReMeTTReNEWPPT.jpg'
+      defaultThumb: 'assets/thumbs/presentation-르메뜨레세미나OfficialV30.jpg'
     },
     {
       key: 'document',
@@ -82,15 +82,15 @@
     }
   ];
 
-  // 히어로 스테이지 대표 프리뷰 슬라이드 목록
+  // 히어로 스테이지 대표 프리뷰 슬라이드 목록 (1순위: Official V3.0)
   const HERO_STAGE_DECKS = [
     {
-      key: 'cell-science',
-      tag: 'OFFICIAL MAIN DECK · 27P',
-      title: '르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학',
-      pages: 27,
-      thumb: 'assets/thumbs/presentation-LReMeTTReNEWPPT.jpg',
-      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/L.ReMeTTRe_NEW_PPT.pdf') + '&title=' + encodeURIComponent('르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학')
+      key: 'v30-seminar',
+      tag: 'OFFICIAL SEMINAR V3.0 · 49P',
+      title: '르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)',
+      pages: 49,
+      thumb: 'assets/thumbs/presentation-르메뜨레세미나OfficialV30.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/르메뜨레 세미나_Official_V3.0.pdf') + '&title=' + encodeURIComponent('르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)')
     },
     {
       key: 'sp-edition',
@@ -101,20 +101,20 @@
       viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/르메뜨레 프레젠테이션_v2.1_SP에디션.pdf') + '&title=' + encodeURIComponent('르메뜨레 공식 프레젠테이션 (v2.1 SP 에디션)')
     },
     {
+      key: 'cell-science',
+      tag: 'OFFICIAL MAIN DECK · 27P',
+      title: '르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학',
+      pages: 27,
+      thumb: 'assets/thumbs/presentation-LReMeTTReNEWPPT.jpg',
+      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/L.ReMeTTRe_NEW_PPT.pdf') + '&title=' + encodeURIComponent('르메뜨레(L.ReMeTTRe) : 세포의 시간을 되돌리는 과학')
+    },
+    {
       key: 'leadership',
       tag: 'LEADERSHIP MASTERCLASS · 16P',
       title: '변화하는 시대, 리더십의 진짜 온도',
       pages: 16,
       thumb: 'assets/thumbs/leadership-masterclass.jpg',
       viewerUrl: 'presentation.html'
-    },
-    {
-      key: 'v30-seminar',
-      tag: 'OFFICIAL SEMINAR V3.0 · 49P',
-      title: '르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)',
-      pages: 49,
-      thumb: 'assets/thumbs/presentation-르메뜨레세미나OfficialV30.jpg',
-      viewerUrl: 'viewer.html?file=' + encodeURIComponent('docs/01_프레젠테이션_강의/르메뜨레 세미나_Official_V3.0.pdf') + '&title=' + encodeURIComponent('르메뜨레 공식 세미나 프레젠테이션 (Official V3.0)')
     },
     {
       key: 'v14-business',
@@ -138,9 +138,9 @@
     currentHeroIdx = (idx + HERO_STAGE_DECKS.length) % HERO_STAGE_DECKS.length;
     const deck = HERO_STAGE_DECKS[currentHeroIdx];
 
-    if (tabDeckCellScience) tabDeckCellScience.classList.toggle('active', deck.key === 'cell-science');
+    if (tabDeckV30Seminar) tabDeckV30Seminar.classList.toggle('active', deck.key === 'v30-seminar');
     if (tabDeckSpEdition) tabDeckSpEdition.classList.toggle('active', deck.key === 'sp-edition');
-    if (tabDeckLeadership) tabDeckLeadership.classList.toggle('active', deck.key === 'leadership');
+    if (tabDeckCellScience) tabDeckCellScience.classList.toggle('active', deck.key === 'cell-science');
 
     if (btnTopLaunch) btnTopLaunch.href = deck.viewerUrl;
     if (heroMainCta) heroMainCta.href = deck.viewerUrl;
@@ -169,14 +169,14 @@
   function initHeroLiveStage() {
     if (!stageCanvas) return;
 
-    if (tabDeckCellScience) {
-      tabDeckCellScience.addEventListener('click', () => renderHeroStage(0));
+    if (tabDeckV30Seminar) {
+      tabDeckV30Seminar.addEventListener('click', () => renderHeroStage(0));
     }
     if (tabDeckSpEdition) {
       tabDeckSpEdition.addEventListener('click', () => renderHeroStage(1));
     }
-    if (tabDeckLeadership) {
-      tabDeckLeadership.addEventListener('click', () => renderHeroStage(2));
+    if (tabDeckCellScience) {
+      tabDeckCellScience.addEventListener('click', () => renderHeroStage(2));
     }
 
     if (stagePrevBtn) {
