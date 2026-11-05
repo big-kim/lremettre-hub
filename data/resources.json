@@ -164,6 +164,39 @@
     "author": "L.REMETTRE BUSINESS GROUP"
   },
   {
+    "id": "presentation-르메뜨레프레젠테이션v21SP에디션",
+    "category": "presentation",
+    "category_name": "프레젠테이션 & 강의",
+    "title": "르메뜨레 프레젠테이션 v2.1 SP에디션",
+    "subtitle": "",
+    "version": "v2.1",
+    "date": "2026-11-05",
+    "badge": "강의/발표",
+    "tags": [
+      "프레젠테이션 & 강의",
+      "v2.1"
+    ],
+    "description": "프레젠테이션 & 강의 공식 자료입니다. 브라우저에서 열람하거나 다운로드하여 프레젠테이션 및 업무에 활용하세요.",
+    "key_points": [
+      "공식 파일 포맷 지원: PDF, PPTX",
+      "최신 업데이트 일자: 2026-11-05",
+      "인터넷 연결 환경에서 원클릭 조회 및 다운로드 가능"
+    ],
+    "downloads": {
+      "pdf": {
+        "url": "docs/01_프레젠테이션_강의/르메뜨레 프레젠테이션_v2.1_SP에디션.pdf",
+        "name": "르메뜨레 프레젠테이션_v2.1_SP에디션.pdf",
+        "size": "4.1 MB"
+      },
+      "pptx": {
+        "url": "docs/01_프레젠테이션_강의/르메뜨레 프레젠테이션_v2.1_SP에디션.pptx",
+        "name": "르메뜨레 프레젠테이션_v2.1_SP에디션.pptx",
+        "size": "29.2 MB"
+      }
+    },
+    "web_deck_url": "viewer.html?file=docs/01_%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_%EA%B0%95%EC%9D%98/%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98_v2.1_SP%EC%97%90%EB%94%94%EC%85%98.pdf&title=%EB%A5%B4%EB%A9%94%EB%9C%A8%EB%A0%88%20%ED%94%84%EB%A0%88%EC%A0%A0%ED%85%8C%EC%9D%B4%EC%85%98%20v2.1%20SP%EC%97%90%EB%94%94%EC%85%98&v=1793853110"
+  },
+  {
     "id": "video-02르메뜨레회원인바디건강다큐HUD비실명판",
     "category": "video",
     "category_name": "영상 자료",
